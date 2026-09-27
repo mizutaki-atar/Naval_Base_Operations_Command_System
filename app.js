@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         let m = MasterData.Abyssals[id] || {};
                         return m.name && (m.name.includes("空母") || m.name.includes("ヲ級"));
                     });
-                    if (nodeEnemyIds.length === 0) nodeEnemyIds = [1525, 1525, 1523]; // fallback
+                    if (!nodeEnemyIds || nodeEnemyIds.length === 0) nodeEnemyIds = [1525, 1525, 1523]; // fallback
                 } else {
                     // 通常マスの敵（道中なのでボスより弱くする。戦艦・空母を減らす）
                     nodeEnemyIds = enemyIds.filter(id => {
@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         return true;
                     });
                     // もし全部消えたら駆逐艦などで埋める
-                    if (nodeEnemyIds.length === 0) nodeEnemyIds = [1501, 1501, 1502, 1502]; 
+                    if (!nodeEnemyIds || nodeEnemyIds.length === 0) nodeEnemyIds = [1501, 1501, 1502, 1502]; 
                 }
 
                 n.enemy = nodeEnemyIds.map(id => {
