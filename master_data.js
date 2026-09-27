@@ -533,6 +533,47 @@ const MasterData = {
                 
                 const kAkRes = await fetch('data/kc3/akashi.json');
                 if (kAkRes.ok) this.KC3.Akashi = await kAkRes.json();
+                
+                const eqTRes = await fetch('data/kc3/equiptype.json');
+                if (eqTRes.ok) {
+                    const rawEqT = await eqTRes.json();
+                    this.EquipType = this.EquipType || {};
+                    for (let id in rawEqT) {
+                        this.EquipType[id] = rawEqT[id].api_name;
+                    }
+                }
+
+                const kIRes = await fetch('data/kc3/items.json');
+                if (kIRes.ok) {
+                    const rawItems = await kIRes.json();
+                    for (let id in rawItems) {
+                        const item = rawItems[id];
+                        const tName = (this.EquipType && item.api_type && this.EquipType[item.api_type[2]]) ? this.EquipType[item.api_type[2]] : (item.api_type ? String(item.api_type[2]) : "不明");
+                        if (this.Items[id]) {
+                            this.Items[id].api_type = item.api_type;
+                            this.Items[id].typeName = tName;
+                        } else {
+                            this.Items[id] = { id: parseInt(id), name: item.api_name, api_type: item.api_type, typeName: tName };
+                        }
+                    }
+                }
+                
+                const kSRes = await fetch('data/kc3/ships.json');
+                if (kSRes.ok) {
+                    const rawShips = await kSRes.json();
+                    for (let id in rawShips) {
+                        const ship = rawShips[id];
+                        if (!this.Ships[id]) {
+                            this.Ships[id] = {
+                                id: ship.api_id,
+                                name: ship.api_name,
+                                yomi: ship.api_yomi,
+                                stype: ship.api_stype,
+                                type_name: this.Stype[ship.api_stype] || "不明"
+                            };
+                        }
+                    }
+                }
             } catch (kc3_e) {
                 console.warn("KC3データのロードに失敗しました", kc3_e);
             }
