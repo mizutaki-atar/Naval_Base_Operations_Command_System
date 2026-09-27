@@ -114,8 +114,8 @@ class SpecialCombatSim {
         if (!AppState.userData) return;
         
         // 保有IDセット (確実に数値として扱う)
-        const ownedShipMstIds = new Set(AppState.userData.ships.map(s => Number(s.api_ship_id)));
-        const ownedItemMstIds = new Set(AppState.userData.items.map(i => Number(i.api_slotitem_id)));
+        const ownedShipMstIds = new Set(AppState.userData.ships.map(s => Number(s.id)));
+        const ownedItemMstIds = new Set(AppState.userData.items.map(i => Number(i.id)));
 
         // 艦娘リスト作成
         let allShips = Object.values(MasterData.Ships);
