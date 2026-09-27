@@ -382,6 +382,8 @@ class MapStrategyOptimizer {
             return m.name || "";
         };
 
+        let currentShipId = null;
+
         // 装備プールから最強のものを検索して取り出すヘルパー
         const popBestItem = (keywords, excludeKeywords = []) => {
             let bestIdx = -1;
@@ -395,6 +397,7 @@ class MapStrategyOptimizer {
                 
                 if (!keywords.some(kw => typeStr.includes(kw) || master.name.includes(kw))) continue;
                 if (excludeKeywords.some(kw => typeStr.includes(kw) || master.name.includes(kw))) continue;
+                if (currentShipId && !MasterData.canEquip(currentShipId, master.id)) continue;
                 
                 // マップ傾向に基づく評価値算出
                 let score = (master.fire || 0)*2 + (master.torp || 0)*1.5 + (master.armor || 0);
@@ -420,6 +423,7 @@ class MapStrategyOptimizer {
         };
 
         fleet.forEach(s => {
+            currentShipId = s.id;
             const master = MasterData.Ships[s.id];
             if (!master) return;
             const stype = master.type_name;
@@ -431,58 +435,60 @@ class MapStrategyOptimizer {
 
             if (MasterData.matchStype(stype, "駆逐") || MasterData.matchStype(stype, "海防艦")) {
                 if (isASWMap) {
-                    assignedEquips = [popBestItem(['ソナー']), popBestItem(['爆雷投射機']), popBestItem(['爆雷', 'ソナー'])];
+                    assignedEquips = assignEquipsByTemplates([['ソナー'], ['爆雷投射機'], ['爆雷', 'ソナー']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (isAntiInst) {
-                    assignedEquips = [popBestItem(['内火艇']), popBestItem(['陸戦隊', '戦車']), popBestItem(['WG42', '迫撃砲'])];
+                    assignedEquips = assignEquipsByTemplates([['内火艇'], ['陸戦隊', '戦車'], ['WG42', '迫撃砲']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (isNightMap) {
                     // 魚魚水CI または 主魚電CI を狙う
-                    assignedEquips = [popBestItem(['魚雷']), popBestItem(['魚雷']), popBestItem(['見張員', '電探'])];
+                    assignedEquips = assignEquipsByTemplates([['魚雷'], ['魚雷'], ['見張員', '電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (needsAA) {
-                    assignedEquips = [popBestItem(['小口径主砲', '高角砲']), popBestItem(['小口径主砲', '高角砲']), popBestItem(['対空機銃', '電探'])];
+                    assignedEquips = assignEquipsByTemplates([['小口径主砲', '高角砲'], ['小口径主砲', '高角砲'], ['対空機銃', '電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else {
-                    assignedEquips = [popBestItem(['小口径主砲', '12.7cm連装砲D型']), popBestItem(['小口径主砲', '12.7cm連装砲D型']), popBestItem(['電探', '魚雷'])];
+                    assignedEquips = assignEquipsByTemplates([['小口径主砲', '12.7cm連装砲D型'], ['小口径主砲', '12.7cm連装砲D型'], ['電探', '魚雷']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 }
             } else if (MasterData.matchStype(stype, "軽巡") || MasterData.matchStype(stype, "雷巡")) {
                 if (isASWMap) {
-                    assignedEquips = [popBestItem(['ソナー']), popBestItem(['爆雷投射機']), popBestItem(['爆雷', 'ソナー', '水上偵察機'])];
+                    assignedEquips = assignEquipsByTemplates([['ソナー'], ['爆雷投射機'], ['爆雷', 'ソナー', '水上偵察機']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (isAntiInst) {
-                    assignedEquips = [popBestItem(['内火艇']), popBestItem(['陸戦隊', '戦車']), popBestItem(['WG42', '迫撃砲'])];
+                    assignedEquips = assignEquipsByTemplates([['内火艇'], ['陸戦隊', '戦車'], ['WG42', '迫撃砲']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (isNightMap) {
-                    assignedEquips = [popBestItem(['魚雷']), popBestItem(['魚雷']), popBestItem(['甲標的', '見張員'])];
+                    assignedEquips = assignEquipsByTemplates([['魚雷'], ['魚雷'], ['甲標的', '見張員']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (needsAA) {
-                    assignedEquips = [popBestItem(['中口径主砲', '小口径主砲']), popBestItem(['中口径主砲', '小口径主砲']), popBestItem(['対空機銃', '電探'])];
+                    assignedEquips = assignEquipsByTemplates([['中口径主砲', '小口径主砲'], ['中口径主砲', '小口径主砲'], ['対空機銃', '電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else {
-                    assignedEquips = [popBestItem(['中口径主砲', '小口径主砲']), popBestItem(['中口径主砲', '小口径主砲']), popBestItem(['水上偵察機', '甲標的', '電探'])];
+                    assignedEquips = assignEquipsByTemplates([['中口径主砲', '小口径主砲'], ['中口径主砲', '小口径主砲'], ['水上偵察機', '甲標的', '電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 }
             } else if (MasterData.matchStype(stype, "戦艦")) {
                 // 特殊砲撃(タッチ)対応艦なら徹甲弾+電探を最優先
                 if (s.name.match(/大和|長門|陸奥|Nelson|Colorado/)) {
-                    assignedEquips = [popBestItem(['大口径主砲']), popBestItem(['大口径主砲']), popBestItem(['徹甲弾']), popBestItem(['大型電探', '水上電探'])];
+                    assignedEquips = assignEquipsByTemplates([['大口径主砲'], ['大口径主砲'], ['徹甲弾'], ['大型電探', '水上電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (isAntiInst) {
-                    assignedEquips = [popBestItem(['大口径主砲']), popBestItem(['大口径主砲']), popBestItem(['三式弾']), popBestItem(['徹甲弾', '水上偵察機'])];
+                    assignedEquips = assignEquipsByTemplates([['大口径主砲'], ['大口径主砲'], ['三式弾'], ['徹甲弾', '水上偵察機']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (needsAA) {
-                    assignedEquips = [popBestItem(['大口径主砲']), popBestItem(['大口径主砲']), popBestItem(['三式弾', '徹甲弾']), popBestItem(['水上偵察機', '水上観測機', '電探'])];
+                    assignedEquips = assignEquipsByTemplates([['大口径主砲'], ['大口径主砲'], ['三式弾', '徹甲弾'], ['水上偵察機', '水上観測機', '電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else {
-                    assignedEquips = [popBestItem(['大口径主砲']), popBestItem(['大口径主砲']), popBestItem(['水上偵察機', '水上観測機']), popBestItem(['徹甲弾', '電探'])];
+                    assignedEquips = assignEquipsByTemplates([['大口径主砲'], ['大口径主砲'], ['水上偵察機', '水上観測機'], ['徹甲弾', '電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 }
             } else if (MasterData.matchStype(stype, "空母")) {
                 if (isNightMap) {
                     // 夜襲CI: 夜戦 + 夜攻 + FBA
-                    assignedEquips = [popBestItem(['夜間戦闘機', '艦上戦闘機']), popBestItem(['夜間攻撃機', '艦上攻撃機']), popBestItem(['艦上爆撃機']), popBestItem(['夜間作戦航空要員', '艦上戦闘機'])];
+                    assignedEquips = assignEquipsByTemplates([['夜間戦闘機', '艦上戦闘機'], ['夜間攻撃機', '艦上攻撃機'], ['艦上爆撃機'], ['夜間作戦航空要員', '艦上戦闘機']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (needsAA) {
-                    assignedEquips = [popBestItem(['艦上戦闘機']), popBestItem(['艦上戦闘機']), popBestItem(['艦上攻撃機', '艦上爆撃機']), popBestItem(['艦上戦闘機', '彩雲'])];
+                    assignedEquips = assignEquipsByTemplates([['艦上戦闘機'], ['艦上戦闘機'], ['艦上攻撃機', '艦上爆撃機'], ['艦上戦闘機', '彩雲']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else {
                     // FBA (戦爆連合)
-                    assignedEquips = [popBestItem(['艦上攻撃機']), popBestItem(['艦上爆撃機']), popBestItem(['艦上戦闘機']), popBestItem(['艦上戦闘機', '彩雲'])];
+                    assignedEquips = assignEquipsByTemplates([['艦上攻撃機'], ['艦上爆撃機'], ['艦上戦闘機'], ['艦上戦闘機', '彩雲']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 }
             } else if (MasterData.matchStype(stype, "重巡") || MasterData.matchStype(stype, "航巡")) {
                 if (isAntiInst) {
-                    assignedEquips = [popBestItem(['中口径主砲']), popBestItem(['中口径主砲']), popBestItem(['三式弾']), popBestItem(['WG42', '水上爆撃機'])];
+                    assignedEquips = assignEquipsByTemplates([['中口径主砲'], ['中口径主砲'], ['三式弾'], ['WG42', '水上爆撃機']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else {
-                    assignedEquips = [popBestItem(['中口径主砲']), popBestItem(['中口径主砲']), popBestItem(['水上偵察機', '水上爆撃機']), popBestItem(['三式弾', '電探', '徹甲弾'])];
+                    assignedEquips = assignEquipsByTemplates([['中口径主砲'], ['中口径主砲'], ['水上偵察機', '水上爆撃機'], ['三式弾', '電探', '徹甲弾']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 }
+            } else if (MasterData.matchStype(stype, "水上機母艦") || MasterData.matchStype(stype, "水母")) {
+                assignedEquips = assignEquipsByTemplates([['水上爆撃機'], ['甲標的', '水上爆撃機'], ['水上爆撃機', '電探', '水上偵察機']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
             } else {
-                assignedEquips = [popBestItem(['主砲']), popBestItem(['主砲']), popBestItem(['電探', '水上偵察機'])];
+                assignedEquips = assignEquipsByTemplates([['主砲'], ['主砲'], ['電探', '水上偵察機']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
             }
 
             // 長さをスロット数に合わせる、足りない部分は -1、スロット数以上の場合は切り捨て
