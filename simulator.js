@@ -118,7 +118,7 @@ self.onmessage = function(e) {
             const engageMod = engagementMods[Math.floor(Math.random() * engagementMods.length)];
 
             // --- 開幕航空戦フェーズ ---
-            currentFleet.filter(f => f.isAlive && (f.name.includes('空母') || f.name.includes('加賀') || f.name.includes('赤城'))).forEach(f => {
+            currentFleet.filter(f => f.isAlive && ([7,11,18].includes(f.stype) || (f.name && f.name.includes('空母')))).forEach(f => {
                 let strikeCount = 2; // 簡易的に1隻につき2スロット分の爆撃とする
                 let hasBomber = (f.bomb || 0) > 0 || (f.torp || 0) > 0;
                 if (hasBomber) {
@@ -164,7 +164,7 @@ self.onmessage = function(e) {
                     if (attacker && attacker.isAlive && targets.length > 0) {
                         let isTaiha = attacker.hp <= attacker.max_hp * 0.25;
                         let isChuha = attacker.hp <= attacker.max_hp * 0.5;
-                        let isCV = attacker.name.includes('空母') || attacker.name.includes('加賀') || attacker.name.includes('赤城') || attacker.name.includes('翔鶴') || attacker.name.includes('瑞鶴');
+                        let isCV = [7,11,18].includes(attacker.stype) || (attacker.name && attacker.name.includes('空母'));
                         let hasBomber = !isCV || (attacker.bomb || 0) > 0 || (attacker.torp || 0) > 0;
                         
                         if (!isTaiha && !(isCV && isChuha) && hasBomber) {
@@ -238,7 +238,7 @@ self.onmessage = function(e) {
                 for (let t = 0; t < maxTurn; t++) {
                     let attacker = currentFleet[t % currentFleet.length];
                     let targets = currentEnemy.filter(e => e.isAlive);
-                    let isCV = attacker && (attacker.name.includes('空母') || attacker.name.includes('加賀') || attacker.name.includes('赤城'));
+                    let isCV = attacker && ([7,11,18].includes(attacker.stype) || (attacker.name && attacker.name.includes('空母')));
                     if (attacker && !isCV && attacker.isAlive && attacker.hp > attacker.max_hp * 0.25 && targets.length > 0) {
                         let target = targets[Math.floor(Math.random() * targets.length)];
                         if (calcHit(attacker, target, false)) {

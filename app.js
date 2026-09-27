@@ -255,9 +255,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             getPaths: function(mapId, fleet, uiNodes) {
                 let numDD = fleet.filter(s => s.stype === 2).length;
                 let numCL = fleet.filter(s => s.stype === 3).length;
-                let numCV = fleet.filter(s => [7,9,11].includes(s.stype) || s.name.includes("空母")).length;
+                let numCV = fleet.filter(s => [7,11,18].includes(s.stype) || s.name.includes("空母")).length;
                 let numAS = fleet.filter(s => s.stype === 20 || s.name.includes("鯨")).length;
-                let numBB = fleet.filter(s => [8,10,12].includes(s.stype) || s.name.includes("戦艦")).length;
+                let numBB = fleet.filter(s => [8,9,10,12].includes(s.stype) || s.name.includes("戦艦")).length;
                 let total = fleet.length;
 
                 let generatedPaths = [];

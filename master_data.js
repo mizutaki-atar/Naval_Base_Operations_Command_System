@@ -27,6 +27,21 @@ const MasterData = {
         }
         return false;
     },
+    canEquip: function(shipId, itemId) {
+        const ship = this.Ships[shipId];
+        const item = this.Items[itemId];
+        if (!ship || !item) return false;
+        
+        if (this.StypeEquip && ship.stype && item.api_type && item.api_type.length >= 3) {
+            const itemTypeId = item.api_type[2];
+            const allowedDict = this.StypeEquip[ship.stype];
+            if (allowedDict && allowedDict[itemTypeId] === 1) {
+                return true;
+            }
+            if (allowedDict) return false;
+        }
+        return true;
+    },
     Stype: typeof WikiKnowledgeDB !== 'undefined' ? WikiKnowledgeDB.Stype : {},
     EquipType: {},
     Ships: typeof WikiKnowledgeDB !== 'undefined' ? WikiKnowledgeDB.Ships : {},
@@ -451,6 +466,9 @@ const MasterData = {
         "1-4": [1503, 1504, 1505, 1506, 1506], // 空母ヲ級, 重巡リ級, 軽巡ヘ級, 駆逐イ級x2
         "1-5": [1509, 1507, 1507, 1507],
         "2-1": [1503, 1503, 1510, 1510, 1506, 1506],
+        "2-2": [1503, 1503, 1504, 1505, 1506, 1506], // ヲ級, ヲ級, リ級, ヘ級, イ級x2
+        "2-3": [1501, 1503, 1504, 1505, 1506, 1506], // ル級, ヲ級, リ級, ヘ級, イ級x2
+        "2-4": [1501, 1501, 1503, 1505, 1506, 1506], // ル級, ル級, ヲ級, ヘ級, イ級x2
         "2-5": [1501, 1501, 1504, 1505, 1506, 1506],
         "3-2": [1505, 1506, 1506, 1506, 1506, 1506],
         "4-5": [1502, 1502, 1503, 1508, 1508, 1508],
@@ -582,6 +600,18 @@ const MasterData = {
                 }
                 
                 const kSRes = await fetch('data/kc3/ships.json');
+                
+                const mstStypeRes = await fetch('data/kc3/api_mst_stype.json');
+                if (mstStypeRes.ok) {
+                    const rawStype = await mstStypeRes.json();
+                    this.StypeEquip = {};
+                    rawStype.forEach(st => {
+                        if (st && st.api_id && st.api_equip_type) {
+                            this.StypeEquip[st.api_id] = st.api_equip_type;
+                        }
+                    });
+                }
+
                 if (kSRes.ok) {
                     const rawShips = await kSRes.json();
                     for (let id in rawShips) {

@@ -50,9 +50,16 @@ function calcShipTotalStats(slotData) {
         stats.asw += im.asw || 0;
         stats.eqAsw += im.asw || 0;
         
-        let tName = im.typeName || "";
-        if (tName === 'ソナー' || tName === '大型ソナー' || tName === '爆雷') {
-            stats.aswGearCount += 1;
+        if (im.type && Array.isArray(im.type) && im.type.length >= 3) {
+            let typeId = im.type[2];
+            if (typeId === 14 || typeId === 15 || typeId === 40) {
+                stats.aswGearCount += 1;
+            }
+        } else {
+            let tName = im.typeName || "";
+            if (tName === 'ソナー' || tName === '大型ソナー' || tName === '爆雷') {
+                stats.aswGearCount += 1;
+            }
         }
 
         stats.los += im.los || 0;
@@ -468,7 +475,13 @@ function openEquipSelector(fleetIndex, slotIndex) {
         else if (sName.includes('駆逐')) sType = '駆逐';
     }
 
-    function canEquip(typeName) {
+    function canEquip(m, typeName) {
+        if (shipMaster && m && m.id) {
+            // MasterData.canEquipが実装されていればそちらを優先
+            if (typeof MasterData.canEquip === 'function') {
+                return MasterData.canEquip(shipMaster.id, m.id);
+            }
+        }
         if (!typeName || typeof typeName !== 'string') return true;
         try {
             if (typeName.includes('特殊潜航艇') || typeName.includes('甲標的')) {
@@ -553,7 +566,7 @@ function openEquipSelector(fleetIndex, slotIndex) {
                 else if (name.includes('徹甲弾')) tName = '徹甲弾';
             }
         }
-        if (!canEquip(tName)) return;
+        if (!canEquip(m, tName)) return;
 
         window._currentEquipListRaw.push({
             m: m,
