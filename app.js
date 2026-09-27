@@ -980,7 +980,6 @@ function updateAdmiralInfo() {
 
 function updateAllViews() {
     if (typeof LevelingSim !== 'undefined') LevelingSim.updateView();
-    if (typeof SpecialCombatSim !== 'undefined') SpecialCombatSim.update();
     updateAdmiralInfo();
     // タブ1の更新（仮想編成エディタの描画）
     const fleetContainer = document.getElementById('fleet1-container');
@@ -1064,6 +1063,7 @@ function updateAllViews() {
         }
         renderSimNodes(); // 初期描画
     }
+    if (typeof SpecialCombatSim !== 'undefined') SpecialCombatSim.update();
 }
 
 async function renderSimNodes() {

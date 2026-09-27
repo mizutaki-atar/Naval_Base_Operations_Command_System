@@ -62,7 +62,8 @@ class SpecialCombatSim {
     
     static update() {
         if (!AppState.simulationFleet || AppState.simulationFleet.length === 0) {
-            alert('第1艦隊に艦娘がセットされていません。タブ1で編成を行ってください。');
+            const res = document.getElementById('sc-air-result');
+            if (res) res.innerText = '第1艦隊がセットされていません。';
             return;
         }
 
