@@ -197,6 +197,8 @@ class SpecialCombatSim {
         }
 
         let wgCount = 0;
+        let mortarCount = 0;
+        let mortarConcCount = 0; // 迫撃砲集中
         let sanshikiCount = 0;
         let apShellCount = 0;
         let tankCount = 0; 
@@ -212,107 +214,146 @@ class SpecialCombatSim {
             if (!mstItem) return;
 
             const n = mstItem.name;
-            if (n.includes('WG42') || n.includes('ロケットランチャー') || n.includes('迫撃砲')) wgCount++;
-            if (n.includes('三式弾')) sanshikiCount++;
-            if (n.includes('徹甲弾')) apShellCount++;
-            if (n.includes('特二式内火艇')) kamiCount++;
-            if (n.includes('戦車') || n.includes('陸戦隊')) tankCount++;
-            else if (n.includes('大発動艇') || n.includes('武装大発')) daihatsuCount++;
+            if (n.includes('WG42')) wgCount++;
+            else if (n.includes('対地噴進砲') || (n.includes('迫撃砲') && n.includes('集中'))) mortarConcCount++;
+            else if (n.includes('迫撃砲')) mortarCount++;
+            else if (n.includes('三式弾')) sanshikiCount++;
+            else if (n.includes('徹甲弾')) apShellCount++;
+            else if (n.includes('特二式内火艇')) kamiCount++;
+            else if (n.includes('戦車') || n.includes('陸戦隊') || n.includes('M4A1') || n.includes('チハ')) tankCount++;
+            else if (n.includes('大発動艇') || n.includes('武装大発')) daihatsuCount++; 
             
-            if (mstItem.type && (mstItem.type[2] === 11)) seaplaneBomberCount++; // 水上爆撃機
+            if (mstItem.type && (mstItem.type[2] === 11)) seaplaneBomberCount++; 
         });
 
-        // 簡易倍率計算エンジン (Wiki準拠の概算)
-        let softSkin = 1.0; let softAdd = 0;
-        let pillbox = 1.0; let pillAdd = 0;
-        let island = 1.0; let islAdd = 0;
-        let depot = 1.0; let depAdd = 0;
+        // Wiki準拠 テーブル構造: キャップ前(Pre) と キャップ後(Post)
+        let softPre = 1.0, softAdd = 0;
+        let pillPre = 1.0, pillAdd = 0;
+        let islPre = 1.0,  islAdd = 0;
+        
+        let depPost = 1.0; 
 
-        // 三式弾
+        // --- 三式弾 ---
         if (sanshikiCount > 0) {
-            softSkin *= 2.5;
-            island *= 1.75;
-            // Depot uses softSkin base
+            softPre *= 2.5;
+            pillPre *= 1.0;
+            islPre *= 1.75;
         }
         
-        // 徹甲弾
+        // --- 徹甲弾 ---
         if (apShellCount > 0) {
-            pillbox *= 1.85;
-            island *= 1.85;
+            softPre *= 1.0;
+            pillPre *= 1.85;
+            islPre *= 1.85;
         }
 
-        // 水上爆撃機
+        // --- 水上爆撃機 ---
         if (seaplaneBomberCount > 0) {
-            softSkin *= 1.2;
-            pillbox *= 1.5;
-            island *= 1.5;
-            depot *= 1.2; 
+            softPre *= 1.2;
+            pillPre *= 1.5;
+            islPre *= 1.0; 
         }
 
-        // WG42系
-        if (wgCount == 1) {
-            softAdd += 75; pillAdd += 75; islAdd += 75; depAdd += 75;
-            pillbox *= 1.25; island *= 1.3; depot *= 1.25;
+        // --- ロケットランチャー (WG42) ---
+        if (wgCount === 1) {
+            softPre *= 1.25; softAdd += 75;
+            pillPre *= 1.6;  pillAdd += 75;
+            islPre *= 1.4;   islAdd += 75;
+            depPost *= 1.25;
         } else if (wgCount >= 2) {
-            softAdd += 110; pillAdd += 110; islAdd += 110; depAdd += 110;
-            pillbox *= 1.625; island *= 1.82; depot *= 1.625;
+            softPre *= 1.625; softAdd += 110;
+            pillPre *= 2.56;  pillAdd += 110;
+            islPre *= 2.1;    islAdd += 110;
+            depPost *= 1.625;
         }
 
-        // 大発系
-        if (daihatsuCount > 0) {
-            pillbox *= 1.5;
-            island *= 1.5;
-            depot *= 1.7;
+        // --- 迫撃砲 ---
+        if (mortarCount === 1) {
+            softPre *= 1.2; softAdd += 30;
+            pillPre *= 1.3; pillAdd += 30;
+            islPre *= 1.2;  islAdd += 30;
+            depPost *= 1.2;
+        } else if (mortarCount >= 2) {
+            softPre *= 1.5; softAdd += 55;
+            pillPre *= 1.82; pillAdd += 55;
+            islPre *= 1.68; islAdd += 55;
+            depPost *= 1.5;
         }
 
-        // 戦車系
+        // --- 迫撃砲集中 ---
+        if (mortarConcCount === 1) {
+            softPre *= 1.25; softAdd += 55;
+            pillPre *= 1.5;  pillAdd += 55;
+            islPre *= 1.3;   islAdd += 55;
+            depPost *= 1.25;
+        } else if (mortarConcCount >= 2) {
+            softPre *= 1.625; softAdd += 115;
+            pillPre *= 2.55;  pillAdd += 115;
+            islPre *= 2.08;   islAdd += 115;
+            depPost *= 1.625;
+        }
+
+        // --- 大発動艇 (通常大発等) ---
+        if (daihatsuCount > 0 && tankCount === 0) {
+            softPre *= 1.0; 
+            pillPre *= 1.8;
+            islPre *= 1.8;
+            depPost *= 1.7; 
+        }
+
+        // --- 陸戦隊 (戦車) ---
         if (tankCount > 0) {
-            softSkin *= 1.2; // roughly
-            pillbox *= 1.8;
-            island *= 1.8;
-            depot *= 1.3; // Stacks with Daihatsu? Actually Tank overrides Daihatsu usually, but we simplify.
+            softPre *= 1.0; 
+            pillPre *= 2.4; 
+            islPre *= 2.8;
+            depPost *= 1.3; 
         }
 
-        // 内火艇
+        // --- 内火艇 ---
         if (kamiCount > 0) {
-            pillbox *= 2.4;
-            island *= 2.4;
-            depot *= 1.7;
+            softPre *= 1.0;
+            pillPre *= 2.4;
+            islPre *= 2.4;
+            depPost *= 1.7;
         }
 
-        // シナジー
+        // --- 上陸用舟艇のシナジー ---
         if (tankCount > 0 && kamiCount > 0) {
-            pillbox *= 1.5;
-            island *= 1.5;
-            // Depot has massive synergy (approx 1.2 extra?)
-            depot *= 1.25; 
+            pillPre *= 1.5;
+            islPre *= 1.5;
+            depPost *= 1.25; 
         }
 
-        // 集積地は「ソフトスキン倍率 × 集積地固有倍率」
-        let finalDepot = softSkin * depot;
-        // 火力加算値はそのまま加算
-
-        const formatResult = (multi, add) => {
-            if (multi === 1.0 && add === 0) return '-';
+        const formatResult = (multi, add, postMulti = 1.0) => {
+            if (multi === 1.0 && add === 0 && postMulti === 1.0) return '-';
             let txt = '';
-            if (multi !== 1.0) txt += `<span style="color:red; font-weight:bold;">x${multi.toFixed(2)}</span>`;
-            if (add > 0) txt += ` <span style="color:blue;">(+${add})</span>`;
+            
+            let preTxt = '';
+            if (multi !== 1.0) preTxt += `<span style="color:red; font-weight:bold;">x${multi.toFixed(2)}</span>`;
+            if (add > 0) preTxt += ` <span style="color:blue;">(+${add})</span>`;
+            
+            if (postMulti !== 1.0) {
+                if (preTxt) txt = `[前] ${preTxt}<br>[後] <span style="color:#d97700; font-weight:bold;">x${postMulti.toFixed(2)}</span>`;
+                else txt = `[後] <span style="color:#d97700; font-weight:bold;">x${postMulti.toFixed(2)}</span>`;
+            } else {
+                txt = preTxt || '-';
+            }
             return txt;
         };
 
         resDiv.innerHTML = `
-            <table style="width:100%; border-collapse:collapse; margin-top:5px; text-align:center;">
-                <tr>
+            <table class="classic-table" style="width:100%; border-collapse:collapse; margin-top:5px; text-align:center;">
+                <tr style="background:#ddd;">
                     <th style="border-bottom:1px solid #ccc; width:25%;">ソフトスキン<br>(飛行場姫)</th>
                     <th style="border-bottom:1px solid #ccc; width:25%;">砲台小鬼</th>
                     <th style="border-bottom:1px solid #ccc; width:25%;">離島棲姫</th>
                     <th style="border-bottom:1px solid #ccc; width:25%;">集積地棲姫<br>(乗算)</th>
                 </tr>
                 <tr>
-                    <td>${formatResult(softSkin, softAdd)}</td>
-                    <td>${formatResult(pillbox, pillAdd)}</td>
-                    <td>${formatResult(island, islAdd)}</td>
-                    <td>${formatResult(finalDepot, softAdd+depAdd)}</td>
+                    <td>${formatResult(softPre, softAdd)}</td>
+                    <td>${formatResult(pillPre, pillAdd)}</td>
+                    <td>${formatResult(islPre, islAdd)}</td>
+                    <td>${formatResult(softPre, softAdd, depPost)}</td>
                 </tr>
             </table>
         `;
