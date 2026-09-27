@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# User Data (Do not push personal KC3 data!)
+kc3_data.json
+my_data/
+
+# Temporary / Scratch
+scratch/
+.idea/
+.vscode/
+
+# Scraped raw data
+data/
+あ艦これ日和/
+海域攻略データ/
+艦これウィキ/

@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "鎮守府作戦司令部 Auto-Sync (専用モジュール)",
+  "version": "1.2",
+  "description": "艦これのAPI通信を傍受し、ローカルの作戦司令部システムへ自動同期します。",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "http://localhost:8000/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "all_frames": true,
+      "js": ["hook.js"],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "all_frames": true,
+      "js": ["content.js"],
+      "world": "ISOLATED",
+      "run_at": "document_start"
+    }
+  ]
+}
