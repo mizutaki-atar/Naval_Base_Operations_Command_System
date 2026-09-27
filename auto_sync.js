@@ -28,11 +28,21 @@ class AutoSyncWatcher {
         const d = json.api_data;
         let cats = {};
 
-        if (d.api_ship2 && d.api_deck_port) {
-            cats.port = json;
-        } else if (d.api_kdock && d.api_basic) {
-            cats.require_info = json;
+        // api_port/port は api_ship2 に艦娘リストが入る
+        if (d.api_ship) cats.ships = d.api_ship;
+        else if (d.api_ship2) cats.ships = d.api_ship2;
+        else if (d.api_ship3) cats.ships = d.api_ship3;
+
+        if (d.api_slot_item) {
+            cats.items = d.api_slot_item;
         }
+        if (d.api_deck_port) {
+            cats.decks = d.api_deck_port;
+        }
+        else if (d.api_deck) {
+            cats.decks = d.api_deck; // デッキだけ単独APIのケース
+        }
+
         return Object.keys(cats).length > 0 ? cats : null;
     }
 

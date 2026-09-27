@@ -118,6 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (updates.decks) {
             AppState.userData.decks = updates.decks;
+            AppState.simulationFleet = []; // 同期時にシミュレータ編成を実データで上書きする
         }
         if (updates.quests) {
             if (!AppState.userData.quests) AppState.userData.quests = {};
