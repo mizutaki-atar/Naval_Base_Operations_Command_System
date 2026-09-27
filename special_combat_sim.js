@@ -113,40 +113,51 @@ class SpecialCombatSim {
     static initPuzzleData() {
         if (!AppState.userData) return;
         
-        // 保有IDセット (確実に数値として扱う)
-        const ownedShipMstIds = new Set(AppState.userData.ships.map(s => Number(s.id)));
-        const ownedItemMstIds = new Set(AppState.userData.items.map(i => Number(i.id)));
+        // 保有IDセット (文字列としてすべて網羅)
+        const ownedShipIds = new Set();
+        (AppState.userData.ships || []).forEach(s => {
+            if (s.id) ownedShipIds.add(String(s.id));
+            if (s.api_ship_id) ownedShipIds.add(String(s.api_ship_id));
+        });
+
+        const ownedItemIds = new Set();
+        (AppState.userData.items || []).forEach(i => {
+            if (i.id) ownedItemIds.add(String(i.id));
+            if (i.api_slotitem_id) ownedItemIds.add(String(i.api_slotitem_id));
+        });
 
         // 艦娘リスト作成
-        let allShips = Object.values(MasterData.Ships);
+        let allShips = Object.entries(MasterData.Ships).map(([k, v]) => Object.assign({ key: k }, v));
         allShips.sort((a,b) => {
-            let aOwned = ownedShipMstIds.has(Number(a.id));
-            let bOwned = ownedShipMstIds.has(Number(b.id));
+            let aOwned = ownedShipIds.has(String(a.key)) || ownedShipIds.has(String(a.id));
+            let bOwned = ownedShipIds.has(String(b.key)) || ownedShipIds.has(String(b.id));
             if (aOwned && !bOwned) return -1;
             if (!aOwned && bOwned) return 1;
-            return Number(a.id) - Number(b.id);
+            return Number(a.key) - Number(b.key);
         });
         
         this.shipOptionsHTML = '<option value="">-- 艦娘を選択 --</option>';
         allShips.forEach(s => {
-            const mark = ownedShipMstIds.has(Number(s.id)) ? '[保有]' : '[未]';
-            this.shipOptionsHTML += `<option value="${s.id}">${mark} ${s.name} (${s.type_name})</option>`;
+            const isOwned = ownedShipIds.has(String(s.key)) || ownedShipIds.has(String(s.id));
+            const mark = isOwned ? '[保有]' : '[未]';
+            this.shipOptionsHTML += `<option value="${s.key}">${mark} ${s.name} (${s.type_name})</option>`;
         });
 
         // 装備リスト作成
-        let allItems = Object.values(MasterData.Items);
+        let allItems = Object.entries(MasterData.Items).map(([k, v]) => Object.assign({ key: k }, v));
         allItems.sort((a,b) => {
-            let aOwned = ownedItemMstIds.has(Number(a.id));
-            let bOwned = ownedItemMstIds.has(Number(b.id));
+            let aOwned = ownedItemIds.has(String(a.key)) || ownedItemIds.has(String(a.id));
+            let bOwned = ownedItemIds.has(String(b.key)) || ownedItemIds.has(String(b.id));
             if (aOwned && !bOwned) return -1;
             if (!aOwned && bOwned) return 1;
-            return Number(a.id) - Number(b.id);
+            return Number(a.key) - Number(b.key);
         });
         
         this.itemOptionsHTML = '<option value="">-- 装備なし --</option>';
         allItems.forEach(i => {
-            const mark = ownedItemMstIds.has(Number(i.id)) ? '[保有]' : '[未]';
-            this.itemOptionsHTML += `<option value="${i.id}">${mark} ${i.name}</option>`;
+            const isOwned = ownedItemIds.has(String(i.key)) || ownedItemIds.has(String(i.id));
+            const mark = isOwned ? '[保有]' : '[未]';
+            this.itemOptionsHTML += `<option value="${i.key}">${mark} ${i.name}</option>`;
         });
     }
 
