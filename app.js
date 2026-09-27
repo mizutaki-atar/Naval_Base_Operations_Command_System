@@ -979,8 +979,8 @@ function updateAdmiralInfo() {
 }
 
 function updateAllViews() {
-    if (typeof LevelingSim !== 'undefined') LevelingSim.updateView();
-    updateAdmiralInfo();
+    try { if (typeof LevelingSim !== 'undefined') LevelingSim.updateView(); } catch(e) { console.warn('LevelingSim.updateView error:', e); }
+    try { updateAdmiralInfo(); } catch(e) { console.warn('updateAdmiralInfo error:', e); }
     // タブ1の更新（仮想編成エディタの描画）
     const fleetContainer = document.getElementById('fleet1-container');
     if (fleetContainer) {
@@ -991,7 +991,7 @@ function updateAllViews() {
                 const deck = AppState.userData.decks[0];
                 (deck.api_ship || []).forEach(uid => {
                     if (uid !== -1) {
-                        const s = AppState.userData.ships.find(x => x.uid === uid);
+                        const s = (AppState.userData.ships || []).find(x => x.uid === uid);
                         if (s) {
                             AppState.simulationFleet.push({
                                 shipUid: s.uid,
@@ -1005,69 +1005,81 @@ function updateAllViews() {
         // 6枠を埋める
         while (AppState.simulationFleet.length < 6) AppState.simulationFleet.push(null);
         
-        renderFleetEditor();
+        try { renderFleetEditor(); } catch(e) { console.warn('renderFleetEditor error:', e); }
     }
     
     // 現在アクティブなタブの再描画
-    if (document.getElementById('tab7').classList.contains('active')) renderDatabase();
-    if (document.getElementById('tab4').classList.contains('active')) {
-        if (typeof window.renderKcsQuests === 'function') window.renderKcsQuests();
-    }
-    if (document.getElementById('tab2').classList.contains('active')) populateLevelingDropdown();
+    try {
+        const tab7 = document.getElementById('tab7');
+        if (tab7 && tab7.classList.contains('active')) renderDatabase();
+        const tab4 = document.getElementById('tab4');
+        if (tab4 && tab4.classList.contains('active')) {
+            if (typeof window.renderKcsQuests === 'function') window.renderKcsQuests();
+        }
+        const tab2 = document.getElementById('tab2');
+        if (tab2 && tab2.classList.contains('active')) populateLevelingDropdown();
+    } catch(e) { console.warn('Tab render error:', e); }
 
     // 遠征プルダウンの更新
-    const expSelect = document.getElementById('expedition-select');
-    if (expSelect) {
-        const currentVal = expSelect.value;
-        expSelect.innerHTML = '';
-        Object.values(MasterData.Expeditions).forEach(exp => {
-            const opt = document.createElement('option');
-            opt.value = exp.id;
-            opt.textContent = `[${exp.id}] ${exp.name || '不明'} (${exp.time || 0}分)`;
-            expSelect.appendChild(opt);
-        });
-        if (currentVal && Array.from(expSelect.options).some(o => o.value === currentVal)) {
-            expSelect.value = currentVal;
+    try {
+        const expSelect = document.getElementById('expedition-select');
+        if (expSelect) {
+            const currentVal = expSelect.value;
+            expSelect.innerHTML = '';
+            Object.values(MasterData.Expeditions || {}).forEach(exp => {
+                const opt = document.createElement('option');
+                opt.value = exp.id;
+                opt.textContent = `[${exp.id}] ${exp.name || '不明'} (${exp.time || 0}分)`;
+                expSelect.appendChild(opt);
+            });
+            if (currentVal && Array.from(expSelect.options).some(o => o.value === currentVal)) {
+                expSelect.value = currentVal;
+            }
         }
-    }
+    } catch(e) { console.warn('Expedition select error:', e); }
 
     // 海域プルダウンの更新
-    const simMapSelect = document.getElementById('sim-target-map');
-    
-    if (simMapSelect) {
-        const currentSim = simMapSelect.value;
-        simMapSelect.innerHTML = '';
+    try {
+        const simMapSelect = document.getElementById('sim-target-map');
         
-        Object.keys(MasterData.MapStrategies).forEach(mapId => {
-            const strategy = MasterData.MapStrategies[mapId];
-            const opt1 = document.createElement('option');
-            opt1.value = mapId;
-            opt1.textContent = strategy.name;
-            simMapSelect.appendChild(opt1);
-        });
-        
-        if (currentSim && Array.from(simMapSelect.options).some(o => o.value === currentSim)) {
-            simMapSelect.value = currentSim;
-        }
-        
-        // 海域が変わった時に自動編成とシミュレーションを連鎖実行するリスナー
-        if (!simMapSelect.hasAttribute('data-listener')) {
-            simMapSelect.setAttribute('data-listener', 'true');
-            simMapSelect.addEventListener('change', async () => {
-                const mapId = simMapSelect.value;
-                window.runAutoOrganize(mapId);
-                await renderSimNodes();
-                const btnRun = document.getElementById('btn-run-sim');
-                if (btnRun) btnRun.click();
+        if (simMapSelect) {
+            const currentSim = simMapSelect.value;
+            simMapSelect.innerHTML = '';
+            
+            Object.keys(MasterData.MapStrategies || {}).forEach(mapId => {
+                const strategy = MasterData.MapStrategies[mapId];
+                const opt1 = document.createElement('option');
+                opt1.value = mapId;
+                opt1.textContent = strategy.name;
+                simMapSelect.appendChild(opt1);
             });
+            
+            if (currentSim && Array.from(simMapSelect.options).some(o => o.value === currentSim)) {
+                simMapSelect.value = currentSim;
+            }
+            
+            // 海域が変わった時に自動編成とシミュレーションを連鎖実行するリスナー
+            if (!simMapSelect.hasAttribute('data-listener')) {
+                simMapSelect.setAttribute('data-listener', 'true');
+                simMapSelect.addEventListener('change', async () => {
+                    try {
+                        const mapId = simMapSelect.value;
+                        window.runAutoOrganize(mapId);
+                        await renderSimNodes();
+                        const btnRun = document.getElementById('btn-run-sim');
+                        if (btnRun) btnRun.click();
+                    } catch(e) { console.warn('Map change handler error:', e); }
+                });
+            }
+            renderSimNodes().catch(e => console.warn('renderSimNodes error:', e)); // 初期描画
         }
-        renderSimNodes(); // 初期描画
-    }
-    if (typeof SpecialCombatSim !== 'undefined') SpecialCombatSim.update();
+    } catch(e) { console.warn('Map select error:', e); }
+    try { if (typeof SpecialCombatSim !== 'undefined') SpecialCombatSim.update(); } catch(e) { console.warn('SpecialCombatSim.update error:', e); }
 }
 
 async function renderSimNodes() {
-    const mapId = document.getElementById('sim-target-map').value;
+  try {
+    const mapId = document.getElementById('sim-target-map')?.value;
     const container = document.getElementById('sim-nodes-container');
     if (!container || !mapId) return;
 
@@ -1203,6 +1215,7 @@ async function renderSimNodes() {
     html += '</div>';
 
     container.innerHTML = routePreviewHtml + html;
+  } catch(e) { console.warn("renderSimNodes internal error:", e); }
 }
 
 function populateLevelingDropdown() {
