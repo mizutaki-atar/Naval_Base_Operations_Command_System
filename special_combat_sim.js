@@ -113,39 +113,39 @@ class SpecialCombatSim {
     static initPuzzleData() {
         if (!AppState.userData) return;
         
-        // 保有IDセット
-        const ownedShipMstIds = new Set(AppState.userData.ships.map(s => s.api_ship_id));
-        const ownedItemMstIds = new Set(AppState.userData.items.map(i => i.api_slotitem_id));
+        // 保有IDセット (確実に数値として扱う)
+        const ownedShipMstIds = new Set(AppState.userData.ships.map(s => Number(s.api_ship_id)));
+        const ownedItemMstIds = new Set(AppState.userData.items.map(i => Number(i.api_slotitem_id)));
 
         // 艦娘リスト作成
         let allShips = Object.values(MasterData.Ships);
         allShips.sort((a,b) => {
-            let aOwned = ownedShipMstIds.has(a.id);
-            let bOwned = ownedShipMstIds.has(b.id);
+            let aOwned = ownedShipMstIds.has(Number(a.id));
+            let bOwned = ownedShipMstIds.has(Number(b.id));
             if (aOwned && !bOwned) return -1;
             if (!aOwned && bOwned) return 1;
-            return a.id - b.id;
+            return Number(a.id) - Number(b.id);
         });
         
         this.shipOptionsHTML = '<option value="">-- 艦娘を選択 --</option>';
         allShips.forEach(s => {
-            const mark = ownedShipMstIds.has(s.id) ? '[保有]' : '[未]';
+            const mark = ownedShipMstIds.has(Number(s.id)) ? '[保有]' : '[未]';
             this.shipOptionsHTML += `<option value="${s.id}">${mark} ${s.name} (${s.type_name})</option>`;
         });
 
         // 装備リスト作成
         let allItems = Object.values(MasterData.Items);
         allItems.sort((a,b) => {
-            let aOwned = ownedItemMstIds.has(a.id);
-            let bOwned = ownedItemMstIds.has(b.id);
+            let aOwned = ownedItemMstIds.has(Number(a.id));
+            let bOwned = ownedItemMstIds.has(Number(b.id));
             if (aOwned && !bOwned) return -1;
             if (!aOwned && bOwned) return 1;
-            return a.id - b.id;
+            return Number(a.id) - Number(b.id);
         });
         
         this.itemOptionsHTML = '<option value="">-- 装備なし --</option>';
         allItems.forEach(i => {
-            const mark = ownedItemMstIds.has(i.id) ? '[保有]' : '[未]';
+            const mark = ownedItemMstIds.has(Number(i.id)) ? '[保有]' : '[未]';
             this.itemOptionsHTML += `<option value="${i.id}">${mark} ${i.name}</option>`;
         });
     }
