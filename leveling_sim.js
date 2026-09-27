@@ -84,7 +84,7 @@ class LevelingSim {
             const lv = ship.api_lv;
             const stype = MasterData.stypes[mst.api_stype];
             const typeName = stype ? stype.api_name : '';
-            const opt = \`<option value="\${ship.api_id}">Lv.\${lv} \${name} (\${typeName})</option>\`;
+            const opt = `<option value="${ship.api_id}">Lv.${lv} ${name} (${typeName})</option>`;
             html += opt;
             escortHtml += opt;
         }
@@ -119,7 +119,7 @@ class LevelingSim {
         const reqExp = KancolleExpTable[targetLv] || 0;
         
         if (currentExp >= reqExp) {
-            res.innerHTML = \`<span style="color:green; font-weight:bold;">すでに目標レベルに到達しています！</span> (現在の累積経験値: \${currentExp})\`;
+            res.innerHTML = `<span style="color:green; font-weight:bold;">すでに目標レベルに到達しています！</span> (現在の累積経験値: ${currentExp})`;
             return;
         }
         
@@ -155,13 +155,13 @@ class LevelingSim {
         const totalAmmo = ammoCost * runs;
         const totalBaux = bauxCost * runs;
         
-        res.innerHTML = \`
+        res.innerHTML = `
             <table style="width:100%; border-collapse:collapse; margin-top:5px; line-height: 1.8;">
-                <tr><td style="width:150px; font-weight:bold;">必要経験値:</td><td>\${diffExp.toLocaleString()} (目標: \${reqExp.toLocaleString()} - 現在: \${currentExp.toLocaleString()})</td></tr>
-                <tr><td style="font-weight:bold;">必要周回数:</td><td><span style="font-size:16px; color:#b22222; font-weight:bold;">約 \${runs.toLocaleString()} 回</span></td></tr>
-                <tr><td style="font-weight:bold;">1周の消費資源:</td><td>燃料 \${fuelCost} / 弾薬 \${ammoCost} / ボーキ \${bauxCost}</td></tr>
-                <tr><td style="font-weight:bold;">総消費資源 (概算):</td><td>燃料 \${totalFuel.toLocaleString()} / 弾薬 \${totalAmmo.toLocaleString()} / ボーキ \${totalBaux.toLocaleString()}</td></tr>
+                <tr><td style="width:150px; font-weight:bold;">必要経験値:</td><td>${diffExp.toLocaleString()} (目標: ${reqExp.toLocaleString()} - 現在: ${currentExp.toLocaleString()})</td></tr>
+                <tr><td style="font-weight:bold;">必要周回数:</td><td><span style="font-size:16px; color:#b22222; font-weight:bold;">約 ${runs.toLocaleString()} 回</span></td></tr>
+                <tr><td style="font-weight:bold;">1周の消費資源:</td><td>燃料 ${fuelCost} / 弾薬 ${ammoCost} / ボーキ ${bauxCost}</td></tr>
+                <tr><td style="font-weight:bold;">総消費資源 (概算):</td><td>燃料 ${totalFuel.toLocaleString()} / 弾薬 ${totalAmmo.toLocaleString()} / ボーキ ${totalBaux.toLocaleString()}</td></tr>
             </table>
-        \`;
+        `;
     }
 }
