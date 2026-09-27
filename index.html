@@ -181,30 +181,48 @@
             <div id="tab0" class="tab-content">
                 <div class="classic-window" style="margin-bottom:8px; height:calc(100vh - 120px); overflow-y:auto;">
                     <div class="classic-titlebar">使い方ガイド（拡張機能連携）</div>
-                    <div class="classic-content" style="padding:10px;">
-                        <h2 style="font-size: 18px; border-bottom: 2px solid #000; margin-bottom: 10px;">はじめに：全自動連携の仕組み</h2>
-                        <p>このシステムは専用のChrome拡張機能と連携することで、ファイルのアップロードやコピー＆ペーストを一切行わずに<strong>全自動で艦隊データを同期</strong>します。</p>
-                        
-                        <h3 style="font-size: 16px; margin-top: 20px; font-weight: bold;">【手順1】専用Chrome拡張機能の導入</h3>
-                        <ol style="list-style-type: decimal; padding-left: 20px; line-height: 1.6;">
-                            <li>配布されている拡張機能のZIPファイルを解凍します。</li>
-                            <li>Google Chromeで <code>chrome://extensions/</code> を開きます。</li>
-                            <li>右上の<strong>「デベロッパーモード」</strong>をオンにします。</li>
-                            <li><strong>「パッケージ化されていない拡張機能を読み込む」</strong>ボタンを押し、解凍したフォルダ（<code>chrome_ext</code>）を選択します。</li>
-                            <li>「鎮守府作戦司令部 Auto-Sync」が追加されれば準備完了です。</li>
-                        </ol>
+                    <div class="classic-content" style="padding:15px; font-size: 13px; line-height: 1.6;">
+                        <h2 style="font-size: 20px; border-bottom: 2px solid #000080; margin-top: 0; margin-bottom: 15px; color: #000080;">はじめに：本システムについて</h2>
+                        <p>「鎮守府作戦司令部 補助システム」へようこそ！<br>
+                        本システムは、あなたの艦隊データ（所属艦娘・所持装備）を読み込み、海域ごとの特効や装備シナジー（夜戦カットイン等）を考慮した<strong>「最強の装備組み合わせ」を全自動で計算（最適化）</strong>したり、出撃シミュレーションを行ったりするための作戦補助ツールです。</p>
 
-                        <h3 style="font-size: 16px; margin-top: 20px; font-weight: bold;">【手順2】艦これをプレイする</h3>
-                        <p>通常通りにDMM等で艦これを開き、プレイしてください（母港画面に遷移すればOKです）。拡張機能がバックグラウンドで最新の艦隊状態を記録し始めます。</p>
+                        <h2 style="font-size: 18px; border-bottom: 2px solid #808080; margin-top: 30px; margin-bottom: 15px;">データの読み込み方法（2種類）</h2>
+                        <p>本システムを利用するには、まずあなたの艦隊データをシステムに読み込ませる必要があります。以下の<strong>A（全自動・推奨）</strong>または<strong>B（手動）</strong>のどちらかの方法でデータを読み込んでください。</p>
 
-                        <h3 style="font-size: 16px; margin-top: 20px; font-weight: bold;">【手順3】このページを開く</h3>
-                        <p>このシステム（作戦司令部）のページを開くと、右上の状態表示が<strong>「🟢 拡張機能と同期中」</strong>となり、あなたの最新の艦娘と装備データが自動的に画面に反映されます！</p>
-                        
-                        <div style="margin-top: 20px; padding: 10px; background-color: #e8f4f8; border: 1px solid #b6d4e1;">
-                            <strong>💡 他のツールとの併用について</strong><br>
-                            他の艦これ専用拡張機能などと併用可能です。同時に動作させても競合しませんのでご安心ください。<br>
-                            もし本システムの拡張機能を入れたくない場合は、画面上部の「クリップボードから読込」ボタンから、手動で外部ツールのデータ（デッキビルダー形式等）を貼り付けることも可能です。
+                        <div style="background-color: #f0f0f0; border: 1px solid #808080; padding: 15px; margin-bottom: 20px;">
+                            <h3 style="font-size: 16px; margin-top: 0; color: #b22222; font-weight: bold;">方法A：専用Chrome拡張機能による全自動同期（おすすめ！）</h3>
+                            <p>専用の拡張機能をブラウザに入れるだけで、艦これをプレイしている裏で自動的に最新データを取得・同期します。ファイル操作は一切不要です。</p>
+                            
+                            <ol style="list-style-type: decimal; padding-left: 25px; margin-bottom: 0;">
+                                <li style="margin-bottom: 8px;">配布されている本システムの<strong>拡張機能（<code>chrome_ext</code> フォルダ）</strong>をお手元のPCに保存・解凍します。</li>
+                                <li style="margin-bottom: 8px;">Google Chromeを開き、URLバーに <code>chrome://extensions/</code> と入力して拡張機能管理画面を開きます。</li>
+                                <li style="margin-bottom: 8px;">画面右上の<strong>「デベロッパーモード」</strong>というスイッチをオンにします。</li>
+                                <li style="margin-bottom: 8px;">左上に現れる<strong>「パッケージ化されていない拡張機能を読み込む」</strong>ボタンを押し、先ほど解凍した <code>chrome_ext</code> フォルダを選択します。</li>
+                                <li style="margin-bottom: 8px;">拡張機能一覧に「鎮守府作戦司令部 Auto-Sync」が追加されたら導入完了です！</li>
+                                <li style="margin-bottom: 8px;">通常通りDMM等で艦これを開き、ゲームをプレイしてください（「母港」画面を開けばデータが取得されます）。</li>
+                                <li>このシステム（作戦司令部）のページを開くと、右上の状態表示が<strong>「🟢 拡張機能と同期中」</strong>となり、あなたの最新データが自動的に画面に反映されます！</li>
+                            </ol>
+                            <p style="margin-top: 10px; font-size: 12px; color: #555;">※他の艦これ専用拡張機能と同時に使用しても問題なく動作します。</p>
                         </div>
+
+                        <div style="background-color: #f9f9f9; border: 1px solid #808080; padding: 15px;">
+                            <h3 style="font-size: 16px; margin-top: 0; color: #006400; font-weight: bold;">方法B：クリップボードからの手動読込（デッキビルダー形式等）</h3>
+                            <p>拡張機能を入れたくない場合や、スマホ等からコピーしたデータを使いたい場合はこちらを使用します。</p>
+                            
+                            <ol style="list-style-type: decimal; padding-left: 25px; margin-bottom: 0;">
+                                <li style="margin-bottom: 8px;">他の外部ツール等から、艦隊データ（デッキビルダー形式のテキストなど）をコピーします。</li>
+                                <li style="margin-bottom: 8px;">本システム画面右上の<strong>「クリップボードから読込」</strong>ボタンを押します。</li>
+                                <li>テキスト入力欄が表示されるので、コピーしたデータを貼り付けて「読込」を押せば完了です。</li>
+                            </ol>
+                        </div>
+
+                        <h2 style="font-size: 18px; border-bottom: 2px solid #808080; margin-top: 30px; margin-bottom: 15px;">主な機能の使い方</h2>
+                        <ul style="list-style-type: disc; padding-left: 25px;">
+                            <li style="margin-bottom: 10px;"><strong>1. 海域作戦立案システム（自動編成・シミュレーター）</strong><br>
+                            出撃したい海域を選び、「海域に合わせて自動編成」ボタンを押すと、あなたが現在所持している装備の中から、その海域の特効やルート固定条件、シナジー（夜戦カットイン等）を計算した上で<strong>最適な装備を自動で割り当てます。</strong>その後「シミュレーター計算開始」を押すと、勝率やバケツ消費量のシミュレーションが行われます。</li>
+                            <li style="margin-bottom: 10px;"><strong>11. シミュレーター計算根拠</strong><br>
+                            自動編成が行われた際、「なぜその装備が選ばれたのか？」「夜戦カットインの倍率はどれくらいか？」「対地特効はどう計算されているか？」といった裏側の計算ロジックや補正値を確認することができます。</li>
+                        </ul>
                     </div>
                 </div>
             </div>
