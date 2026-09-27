@@ -107,6 +107,12 @@ self.onmessage = function(e) {
             }
             results.nodes[node.name].pass++;
 
+            if (node.isGoal) {
+                results.nodes[node.name].s_win++;
+                if (isBoss) results.total_s_win++;
+                continue;
+            }
+
             let currentEnemy = cloneFleet(node.enemy);
             let fMod = formMods[node.formation] || formMods[1];
             const engageMod = engagementMods[Math.floor(Math.random() * engagementMods.length)];
@@ -146,7 +152,8 @@ self.onmessage = function(e) {
             });
 
             // --- 昼戦フェーズ ---
-            let hasBB = currentFleet.some(f => [8,9,10,12].includes(f.stype) || f.name.includes('戦艦')) || currentEnemy.some(e => e.name.includes('戦艦'));
+            if (!node.isAir) {
+                let hasBB = currentFleet.some(f => [8,9,10,12].includes(f.stype) || f.name.includes('戦艦')) || currentEnemy.some(e => e.name.includes('戦艦'));
             let shellingRounds = hasBB ? 2 : 1;
             const maxTurn = 6;
 
@@ -265,6 +272,7 @@ self.onmessage = function(e) {
                     }
                 }
             }
+            } // end if (!node.isAir)
 
             // --- 勝敗判定 ---
             let eDeadCount = currentEnemy.filter(e => !e.isAlive).length;

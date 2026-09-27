@@ -343,6 +343,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const m = MasterData.Abyssals[id] || { name: (id===1531?"潜水カ級":id===1532?"潜水ヨ級":"謎の敵"), hp: 20, fire: 10, torp: 40, armor: 10, stype: (id===1531||id===1532)?13:2 };
                     return Object.assign({}, m);
                 });
+                n.isAir = isAir;
+                n.isGoal = n.name.includes("ゴール");
             });
         });
         
