@@ -81,7 +81,7 @@ class AutoSyncWatcher {
 
                 if (hasUpdates && this.onDataUpdated) {
                     this.onDataUpdated(totalUpdates);
-                    this.showDebugLog("拡張機能から最新データを受信・同期しました");
+                    this.showDebugLog(`同期完了: ${Object.keys(totalUpdates).join(', ')}`);
                     
                     const statusEl = document.getElementById('sync-status');
                     if (statusEl) {
