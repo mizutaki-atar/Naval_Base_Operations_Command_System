@@ -78,7 +78,22 @@ class SpecialCombatSim {
 
                             <strong>【パズルカスタマイズ】</strong><br>
                             保有している艦娘・装備は「[保有]」マークが付き上部に表示されます。未保有のものも検証のために選択可能です。<br>
-                            ※集積地棲姫へのダメージは「ソフトスキン倍率 × 集積地固有倍率」で爆発的に跳ね上がります。
+                            ※集積地棲姫へのダメージは「ソフトスキン倍率 × 集積地固有倍率」で爆発的に跳ね上がります。<br><br>
+                            
+                            <div style="font-size:11px; color:#555; background:#eee; padding:8px; border-radius:4px; border:1px solid #ccc;">
+                                <strong>※当シミュレーターの計算根拠および参考文献（注釈）</strong><br>
+                                本システムにおける対地特効の倍率・加算値およびシナジーの仕様は、有志のプレイヤーコミュニティ（検証勢）による膨大な実測データに基づき、以下の文献・ツールの計算式を参考・引用して構築されています。<br>
+                                <ul style="margin:4px 0 0 15px; padding:0;">
+                                    <li><strong>艦隊これくしょん -艦これ- 攻略 Wiki* 「対地攻撃」</strong><br>
+                                    (<a href="https://wikiwiki.jp/kancolle/%E5%AF%BE%E5%9C%B0%E6%94%BB%E6%92%83" target="_blank" style="color:#0000ee;">https://wikiwiki.jp/kancolle/対地攻撃</a>)<br>
+                                    最も詳細な対地倍率テーブルとシナジーの仕様が検証・集約されている一次情報源です。当システムの乗算仕様やWG42の固定値加算ロジックはこれに準拠しています。</li>
+                                    <li><strong>KC3改 (KanColle Command Center 改)</strong><br>
+                                    (<a href="https://github.com/KC3Kai/KC3Kai" target="_blank" style="color:#0000ee;">https://github.com/KC3Kai/KC3Kai</a>)<br>
+                                    海外コミュニティが主導する拡張機能。ソースコード内のダメージ計算式（特に対地シナジーの重複処理）のアルゴリズムを参考にしています。</li>
+                                    <li><strong>作戦室 Jervis OR / 制空権シミュレータ</strong><br>
+                                    最新の装備シナジーやキャップ後補正の挙動など、最新の検証結果を素早く取り入れている主要な計算機ツールです。</li>
+                                </ul>
+                            </div>
                         </div>
                         
                         <div id="land-puzzle-container" style="display:flex; flex-direction:column; gap:8px;"></div>
