@@ -382,7 +382,22 @@ class SpecialCombatSim {
     }
 
     static update() {
-        // これは app.js から自動同期時に呼ばれるが、パズルUIなので自動更新は航空と索敵だけに留める
+        // データロード完了後、または同期完了後に呼ばれるので、保有状況を再生成する
+        this.initPuzzleData();
+
+        // 既にレンダリング済みのパズルドロップダウンがあれば更新する
+        document.querySelectorAll('.puzzle-ship').forEach(sel => {
+            const val = sel.value;
+            sel.innerHTML = this.shipOptionsHTML;
+            sel.value = val;
+        });
+        document.querySelectorAll('.puzzle-equip').forEach(sel => {
+            const val = sel.value;
+            sel.innerHTML = this.itemOptionsHTML;
+            sel.value = val;
+        });
+
+        // 航空と索敵の更新
         this.updateAirAndLos();
     }
 
