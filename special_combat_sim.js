@@ -29,7 +29,53 @@ class SpecialCombatSim {
                     <!-- 陸上戦パズルUI -->
                     <div style="background-color:#f8e8e8; padding:10px; border:1px solid #e1b6b6; margin-bottom:15px;">
                         <h3 style="margin-top:0; border-bottom:1px solid #000; color:#8b0000;">🏝️ 対地戦 (陸上型深海棲艦) 特効パズル</h3>
-                        <div style="font-size:12px; margin-bottom:10px; color:#333;">
+                        
+                        <div style="font-size:12px; margin-bottom:15px; color:#333; line-height:1.6;">
+                            <details style="background:#fff; border:1px solid #ccc; padding:8px; margin-bottom:8px;" open>
+                                <summary style="font-weight:bold; cursor:pointer; color:#b22222;">📖 対地装備のメリット・デメリットとシナジー (クリックで開閉)</summary>
+                                <div style="margin-top:8px; border-top:1px dashed #ccc; padding-top:8px;">
+                                    <strong>【主要な対地装備の特性】</strong>
+                                    <ul style="margin:4px 0 10px 20px; padding:0;">
+                                        <li><span style="color:#000080; font-weight:bold;">三式弾</span><br>
+                                        [メリット] ソフトスキン(飛行場姫など)に対して2.5倍という絶大な倍率を誇ります。戦艦や重巡に積めるため基礎火力が高い。<br>
+                                        [デメリット] 砲台小鬼には全く特効が乗りません。</li>
+                                        <li><span style="color:#000080; font-weight:bold;">WG42 (対地ロケット)</span><br>
+                                        [メリット] 全ての陸上型に固定ダメージ(加算)と倍率を与えます。駆逐・軽巡の対地主軸。<br>
+                                        [デメリット] これ単体では倍率が低く、特に集積地などには力不足。2〜3積みで真価を発揮します。</li>
+                                        <li><span style="color:#000080; font-weight:bold;">大発動艇(八九式中戦車) などの戦車系</span><br>
+                                        [メリット] 砲台小鬼や離島に対して高い倍率。後述の内火艇と組み合わせることで爆発的なシナジーを生みます。<br>
+                                        [デメリット] 搭載できる艦娘が限られます（特定の大発搭載可能艦のみ）。</li>
+                                        <li><span style="color:#000080; font-weight:bold;">特二式内火艇 (カミ車)</span><br>
+                                        [メリット] 砲台や離島に対して単体で2.4倍と最強クラスの倍率。潜水艦にも積めます。<br>
+                                        [デメリット] 戦車以上に搭載可能艦が限定されます。</li>
+                                        <li><span style="color:#000080; font-weight:bold;">徹甲弾</span><br>
+                                        [メリット] 砲台小鬼と離島棲姫に対して1.85倍の特効。戦艦の昼戦連撃と両立できるのが最大の強み。<br>
+                                        [デメリット] ソフトスキン(飛行場姫)には無効です。</li>
+                                    </ul>
+                                    
+                                    <strong>【対地シナジー（相乗効果）の概念】</strong>
+                                    <p style="margin:4px 0 10px 0;">
+                                        艦これの対地戦において最も重要なのが<strong>「戦車 ＋ 内火艇」のシナジー</strong>です。<br>
+                                        この2つを同時に積むことで、それぞれの個別倍率に加え、さらに<strong>「シナジー倍率(約1.5倍)」</strong>が乗算されます。<br>
+                                        特に「集積地棲姫」に対しては、「ソフトスキン用の倍率」と「集積地専用の倍率」が二重に掛け算される特殊仕様があるため、<br>
+                                        <span style="color:red; font-weight:bold;">WG42 ＋ 戦車 ＋ 内火艇</span> のように積むと、倍率が数十倍に跳ね上がり、昼戦からカンストダメージ（9999）を叩き出します。
+                                    </p>
+
+                                    <strong>【対地特効に向いた艦娘（メリット・デメリット）】</strong>
+                                    <ul style="margin:4px 0 0 20px; padding:0;">
+                                        <li><span style="color:#006400; font-weight:bold;">4スロットの軽巡・駆逐 (大淀、Tashkent など)</span><br>
+                                        [メリット] スロット数の多さを活かし「WG42×2 ＋ 戦車 ＋ 内火艇」といった欲張りフルシナジー装備が可能。対地火力は最強クラス。<br>
+                                        [デメリット] そもそも大淀やTashkentは大発系が積めないためWG42ガン積みに依存する等、艦ごとに搭載制限のジレンマがあります。</li>
+                                        <li><span style="color:#006400; font-weight:bold;">大発・内火艇が両方積める駆逐艦 (Верный、霞改二、満潮改二、朝潮改二丁 など)</span><br>
+                                        [メリット] 「戦車＋内火艇」の強烈なシナジーを活かせる対地のエース。イベント海域の対地ボスでは必須級です。<br>
+                                        [デメリット] 夜戦連撃（主砲2）と対地シナジーを両立させるにはスロットが足りず、道中の水上艦隊相手には弱くなりがちです。</li>
+                                        <li><span style="color:#006400; font-weight:bold;">水上機母艦 (日進、Commandant Teste など)</span><br>
+                                        [メリット] 大発系が積める上に4スロットあるため、昼戦連撃と対地シナジーを両立できる最強の対地要員。<br>
+                                        [デメリット] 装甲や回避が低く、ボス到達前に大破しやすいのが弱点です。</li>
+                                    </ul>
+                                </div>
+                            </details>
+
                             <strong>【パズルカスタマイズ】</strong><br>
                             保有している艦娘・装備は「[保有]」マークが付き上部に表示されます。未保有のものも検証のために選択可能です。<br>
                             ※集積地棲姫へのダメージは「ソフトスキン倍率 × 集積地固有倍率」で爆発的に跳ね上がります。
