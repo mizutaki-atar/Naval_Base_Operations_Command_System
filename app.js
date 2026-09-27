@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await KCSDB.init();
     await MasterData.load();
     if (typeof LevelingSim !== 'undefined') LevelingSim.init();
+    if (typeof SpecialCombatSim !== 'undefined') SpecialCombatSim.init();
 
     if (window.SynergyEngine) {
         window.currentSynergyEngine = new window.SynergyEngine();
@@ -979,6 +980,7 @@ function updateAdmiralInfo() {
 
 function updateAllViews() {
     if (typeof LevelingSim !== 'undefined') LevelingSim.updateView();
+    if (typeof SpecialCombatSim !== 'undefined') SpecialCombatSim.update();
     updateAdmiralInfo();
     // タブ1の更新（仮想編成エディタの描画）
     const fleetContainer = document.getElementById('fleet1-container');
