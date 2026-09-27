@@ -503,6 +503,128 @@ class MapStrategyOptimizer {
     }
 }
 
+
+        // Helper Functions
+        const getEquipTypeStr = (m) => {
+            if (!m) return "";
+            if (typeof m.typeName === 'string' && m.typeName !== "不明") return m.typeName;
+            const tId = m.type && m.type[2] ? m.type[2] : m.typeName;
+            if (tId === 1) return '小口径主砲';
+            if (tId === 2) return '中口径主砲';
+            if (tId === 3) return '大口径主砲';
+            if (tId === 4) return '副砲';
+            if (tId === 5) return '魚雷';
+            if (tId === 6 || tId === 7 || tId === 8 || tId === 57) return '艦上戦闘機';
+            if (tId === 9 || tId === 10 || tId === 59) return '艦上爆撃機';
+            if (tId === 11 || tId === 41 || tId === 58) return '艦上攻撃機';
+            if (tId === 12) return '小型電探';
+            if (tId === 13) return '大型電探';
+            if (tId === 17) return '水上偵察機';
+            if (tId === 18) return '水上爆撃機';
+            if (tId === 19) return '徹甲弾';
+            if (tId === 14 || tId === 40 || m.name.includes('ソナー') || m.name.includes('探信儀') || m.name.includes('聴音機')) return 'ソナー';
+            if (tId === 15 || m.name.includes('投射機')) return '爆雷投射機';
+            if (tId === 43 || (m.name.includes('爆雷') && !m.name.includes('投射機'))) return '爆雷';
+            if (m.name.includes('機銃')) return '対空機銃';
+            return m.name || "";
+        };
+
+        let currentShipId = null;
+
+        const evaluateCombination = (shipMaster, uids, isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS) => {
+            const eqObjs = uids.map(uid => availableItems.find(x => x.uid === uid)).filter(x => x).map(x => MasterData.Items[x.id]);
+            let baseScore = 0;
+            eqObjs.forEach(m => {
+                let s = (m.fire || 0)*2 + (m.torp || 0)*1.5 + (m.armor || 0);
+                if (isASWMap) s += (m.asw || 0) * 10; else s += (m.asw || 0) * 0.5;
+                if (needsAA) s += (m.aa || 0) * 5; else s += (m.aa || 0) * 1;
+                if (needsLOS) s += (m.los || 0) * 5; else s += (m.los || 0) * 1;
+                baseScore += s;
+            });
+            
+            if (window.currentSynergyEngine) {
+                const syn = window.currentSynergyEngine.evaluate(shipMaster, eqObjs);
+                let synScore = (syn.bonuses.fire || 0)*2 + (syn.bonuses.torp || 0)*1.5 + (syn.bonuses.armor || 0);
+                if (isASWMap) synScore += (syn.bonuses.asw || 0) * 10; else synScore += (syn.bonuses.asw || 0) * 0.5;
+                
+                let mult = 1.0;
+                if (isNightMap) mult = syn.multipliers.night;
+                else mult = syn.multipliers.day;
+                if (isAntiInst) mult *= syn.multipliers.inst;
+                if (mapDesc.includes("PT")) mult *= syn.multipliers.pt;
+                
+                return (baseScore + synScore) * mult;
+            }
+            return baseScore;
+        };
+
+        const assignEquipsByTemplates = (templates, isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS) => {
+            const candidateLists = templates.map((keywords) => {
+                const validItems = availableItems.filter(it => {
+                    const master = MasterData.Items[it.id];
+                    if (!master) return false;
+                    if (!MasterData.canEquip(currentShipId, master.id)) return false;
+                    const typeStr = getEquipTypeStr(master);
+                    if (!keywords || keywords.length === 0) return true; // allow anything if empty
+                    return keywords.some(kw => typeStr.includes(kw) || master.name.includes(kw));
+                });
+                
+                validItems.sort((a, b) => {
+                    const ma = MasterData.Items[a.id];
+                    const mb = MasterData.Items[b.id];
+                    let sa = (ma.fire || 0)*2 + (ma.torp || 0)*1.5 + (ma.armor || 0);
+                    let sb = (mb.fire || 0)*2 + (mb.torp || 0)*1.5 + (mb.armor || 0);
+                    if (isASWMap) { sa += (ma.asw||0)*10; sb += (mb.asw||0)*10; }
+                    else { sa += (ma.asw||0)*0.5; sb += (mb.asw||0)*0.5; }
+                    return sb - sa;
+                });
+                
+                return validItems.slice(0, 3).map(x => x.uid);
+            });
+            
+            let bestComb = [];
+            let bestScore = -1;
+            const shipMaster = MasterData.Ships[currentShipId];
+            
+            const backtrack = (slotIdx, currentComb) => {
+                if (slotIdx === templates.length) {
+                    const score = evaluateCombination(shipMaster, currentComb, isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestComb = [...currentComb];
+                    }
+                    return;
+                }
+                const cands = candidateLists[slotIdx];
+                if (cands.length === 0) {
+                    currentComb.push(-1);
+                    backtrack(slotIdx + 1, currentComb);
+                    currentComb.pop();
+                } else {
+                    for (let uid of cands) {
+                        if (!currentComb.includes(uid)) {
+                            currentComb.push(uid);
+                            backtrack(slotIdx + 1, currentComb);
+                            currentComb.pop();
+                        }
+                    }
+                }
+            };
+            
+            backtrack(0, []);
+            
+            bestComb.forEach(uid => {
+                if (uid !== -1) {
+                    const idx = availableItems.findIndex(x => x.uid === uid);
+                    if (idx !== -1) availableItems.splice(idx, 1);
+                }
+            });
+            
+            return bestComb;
+        };
+
+        
+
 class LevelingAdvisor {
     constructor(userData) {
         this.items = userData.items || [];
