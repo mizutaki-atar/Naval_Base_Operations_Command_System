@@ -381,102 +381,45 @@ class MapStrategyOptimizer {
             if (m.name.includes('機銃')) return '対空機銃';
             return m.name || "";
         };
-        let currentShipId = null;
 
-        const evaluateCombination = (shipMaster, uids, isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS) => {
-            const eqObjs = uids.map(uid => availableItems.find(x => x.uid === uid)).filter(x => x).map(x => MasterData.Items[x.id]);
-            let baseScore = 0;
-            eqObjs.forEach(m => {
-                let s = (m.fire || 0)*2 + (m.torp || 0)*1.5 + (m.armor || 0);
-                if (isASWMap) s += (m.asw || 0) * 10; else s += (m.asw || 0) * 0.5;
-                if (needsAA) s += (m.aa || 0) * 5; else s += (m.aa || 0) * 1;
-                if (needsLOS) s += (m.los || 0) * 5; else s += (m.los || 0) * 1;
-                baseScore += s;
-            });
-            
-            if (window.currentSynergyEngine) {
-                const syn = window.currentSynergyEngine.evaluate(shipMaster, eqObjs);
-                let synScore = (syn.bonuses.fire || 0)*2 + (syn.bonuses.torp || 0)*1.5 + (syn.bonuses.armor || 0);
-                if (isASWMap) synScore += (syn.bonuses.asw || 0) * 10; else synScore += (syn.bonuses.asw || 0) * 0.5;
+        // 装備プールから最強のものを検索して取り出すヘルパー
+        const popBestItem = (keywords, excludeKeywords = []) => {
+            let bestIdx = -1;
+            let bestStat = -1;
+            for (let i = 0; i < availableItems.length; i++) {
+                const it = availableItems[i];
+                const master = MasterData.Items[it.id];
+                if (!master) continue;
                 
-                let mult = 1.0;
-                if (isNightMap) mult = syn.multipliers.night;
-                else mult = syn.multipliers.day;
-                if (isAntiInst) mult *= syn.multipliers.inst;
-                if (mapDesc.includes("PT")) mult *= syn.multipliers.pt;
+                const typeStr = getEquipTypeStr(master);
                 
-                return (baseScore + synScore) * mult;
+                if (!keywords.some(kw => typeStr.includes(kw) || master.name.includes(kw))) continue;
+                if (excludeKeywords.some(kw => typeStr.includes(kw) || master.name.includes(kw))) continue;
+                
+                // マップ傾向に基づく評価値算出
+                let score = (master.fire || 0)*2 + (master.torp || 0)*1.5 + (master.armor || 0);
+                
+                if (isASWMap) score += (master.asw || 0) * 10;
+                else score += (master.asw || 0) * 0.5;
+                
+                if (needsAA) score += (master.aa || 0) * 5;
+                else score += (master.aa || 0) * 1;
+                
+                if (needsLOS) score += (master.los || 0) * 5;
+                else score += (master.los || 0) * 1;
+                
+                if (score > bestStat) {
+                    bestStat = score;
+                    bestIdx = i;
+                }
             }
-            return baseScore;
-        };
-
-        const assignEquipsByTemplates = (templates, isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS) => {
-            const candidateLists = templates.map((keywords) => {
-                const validItems = availableItems.filter(it => {
-                    const master = MasterData.Items[it.id];
-                    if (!master) return false;
-                    if (!MasterData.canEquip(currentShipId, master.id)) return false;
-                    const typeStr = getEquipTypeStr(master);
-                    if (keywords.length === 0) return true; // allow anything if empty
-                    return keywords.some(kw => typeStr.includes(kw) || master.name.includes(kw));
-                });
-                
-                validItems.sort((a, b) => {
-                    const ma = MasterData.Items[a.id];
-                    const mb = MasterData.Items[b.id];
-                    let sa = (ma.fire || 0)*2 + (ma.torp || 0)*1.5 + (ma.armor || 0);
-                    let sb = (mb.fire || 0)*2 + (mb.torp || 0)*1.5 + (mb.armor || 0);
-                    if (isASWMap) { sa += (ma.asw||0)*10; sb += (mb.asw||0)*10; }
-                    else { sa += (ma.asw||0)*0.5; sb += (mb.asw||0)*0.5; }
-                    return sb - sa;
-                });
-                
-                return validItems.slice(0, 3).map(x => x.uid);
-            });
-            
-            let bestComb = [];
-            let bestScore = -1;
-            const shipMaster = MasterData.Ships[currentShipId];
-            
-            const backtrack = (slotIdx, currentComb) => {
-                if (slotIdx === templates.length) {
-                    const score = evaluateCombination(shipMaster, currentComb, isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestComb = [...currentComb];
-                    }
-                    return;
-                }
-                const cands = candidateLists[slotIdx];
-                if (cands.length === 0) {
-                    currentComb.push(-1);
-                    backtrack(slotIdx + 1, currentComb);
-                    currentComb.pop();
-                } else {
-                    for (let uid of cands) {
-                        if (!currentComb.includes(uid)) {
-                            currentComb.push(uid);
-                            backtrack(slotIdx + 1, currentComb);
-                            currentComb.pop();
-                        }
-                    }
-                }
-            };
-            
-            backtrack(0, []);
-            
-            bestComb.forEach(uid => {
-                if (uid !== -1) {
-                    const idx = availableItems.findIndex(x => x.uid === uid);
-                    if (idx !== -1) availableItems.splice(idx, 1);
-                }
-            });
-            
-            return bestComb;
+            if (bestIdx !== -1) {
+                return availableItems.splice(bestIdx, 1)[0].uid;
+            }
+            return -1;
         };
 
         fleet.forEach(s => {
-            currentShipId = s.id;
             const master = MasterData.Ships[s.id];
             if (!master) return;
             const stype = master.type_name;
@@ -488,58 +431,58 @@ class MapStrategyOptimizer {
 
             if (MasterData.matchStype(stype, "駆逐") || MasterData.matchStype(stype, "海防艦")) {
                 if (isASWMap) {
-                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['ソナー']), popBestItem(['爆雷投射機']), popBestItem(['爆雷', 'ソナー'])];
                 } else if (isAntiInst) {
-                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['内火艇']), popBestItem(['陸戦隊', '戦車']), popBestItem(['WG42', '迫撃砲'])];
                 } else if (isNightMap) {
                     // 魚魚水CI または 主魚電CI を狙う
-                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['魚雷']), popBestItem(['魚雷']), popBestItem(['見張員', '電探'])];
                 } else if (needsAA) {
-                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['小口径主砲', '高角砲']), popBestItem(['小口径主砲', '高角砲']), popBestItem(['対空機銃', '電探'])];
                 } else {
-                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['小口径主砲', '12.7cm連装砲D型']), popBestItem(['小口径主砲', '12.7cm連装砲D型']), popBestItem(['電探', '魚雷'])];
                 }
             } else if (MasterData.matchStype(stype, "軽巡") || MasterData.matchStype(stype, "雷巡")) {
                 if (isASWMap) {
-                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['ソナー']), popBestItem(['爆雷投射機']), popBestItem(['爆雷', 'ソナー', '水上偵察機'])];
                 } else if (isAntiInst) {
-                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['内火艇']), popBestItem(['陸戦隊', '戦車']), popBestItem(['WG42', '迫撃砲'])];
                 } else if (isNightMap) {
-                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['魚雷']), popBestItem(['魚雷']), popBestItem(['甲標的', '見張員'])];
                 } else if (needsAA) {
-                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['中口径主砲', '小口径主砲']), popBestItem(['中口径主砲', '小口径主砲']), popBestItem(['対空機銃', '電探'])];
                 } else {
-                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['中口径主砲', '小口径主砲']), popBestItem(['中口径主砲', '小口径主砲']), popBestItem(['水上偵察機', '甲標的', '電探'])];
                 }
             } else if (MasterData.matchStype(stype, "戦艦")) {
                 // 特殊砲撃(タッチ)対応艦なら徹甲弾+電探を最優先
                 if (s.name.match(/大和|長門|陸奥|Nelson|Colorado/)) {
-                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['大口径主砲']), popBestItem(['大口径主砲']), popBestItem(['徹甲弾']), popBestItem(['大型電探', '水上電探'])];
                 } else if (isAntiInst) {
-                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['大口径主砲']), popBestItem(['大口径主砲']), popBestItem(['三式弾']), popBestItem(['徹甲弾', '水上偵察機'])];
                 } else if (needsAA) {
-                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['大口径主砲']), popBestItem(['大口径主砲']), popBestItem(['三式弾', '徹甲弾']), popBestItem(['水上偵察機', '水上観測機', '電探'])];
                 } else {
-                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['大口径主砲']), popBestItem(['大口径主砲']), popBestItem(['水上偵察機', '水上観測機']), popBestItem(['徹甲弾', '電探'])];
                 }
             } else if (MasterData.matchStype(stype, "空母")) {
                 if (isNightMap) {
                     // 夜襲CI: 夜戦 + 夜攻 + FBA
-                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['夜間戦闘機', '艦上戦闘機']), popBestItem(['夜間攻撃機', '艦上攻撃機']), popBestItem(['艦上爆撃機']), popBestItem(['夜間作戦航空要員', '艦上戦闘機'])];
                 } else if (needsAA) {
-                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['艦上戦闘機']), popBestItem(['艦上戦闘機']), popBestItem(['艦上攻撃機', '艦上爆撃機']), popBestItem(['艦上戦闘機', '彩雲'])];
                 } else {
                     // FBA (戦爆連合)
-                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['艦上攻撃機']), popBestItem(['艦上爆撃機']), popBestItem(['艦上戦闘機']), popBestItem(['艦上戦闘機', '彩雲'])];
                 }
             } else if (MasterData.matchStype(stype, "重巡") || MasterData.matchStype(stype, "航巡")) {
                 if (isAntiInst) {
-                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['中口径主砲']), popBestItem(['中口径主砲']), popBestItem(['三式弾']), popBestItem(['WG42', '水上爆撃機'])];
                 } else {
-                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = [popBestItem(['中口径主砲']), popBestItem(['中口径主砲']), popBestItem(['水上偵察機', '水上爆撃機']), popBestItem(['三式弾', '電探', '徹甲弾'])];
                 }
             } else {
-                assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                assignedEquips = [popBestItem(['主砲']), popBestItem(['主砲']), popBestItem(['電探', '水上偵察機'])];
             }
 
             // 長さをスロット数に合わせる、足りない部分は -1、スロット数以上の場合は切り捨て
