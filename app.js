@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         if (updates.basic) {
-            AppState.userData.basic = updates.basic;
+            if (!AppState.userData.basic) AppState.userData.basic = {}; Object.assign(AppState.userData.basic, updates.basic);
         }
         // deckbuilder等は必要に応じて
         

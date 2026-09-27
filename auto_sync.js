@@ -49,6 +49,16 @@ class AutoSyncWatcher {
         return Object.keys(cats).length > 0 ? cats : null;
     }
 
+    static mergeUpdates(target, source) {
+        for (let key in source) {
+            if (key === 'basic' && target.basic) {
+                Object.assign(target.basic, source.basic);
+            } else {
+                target[key] = source[key];
+            }
+        }
+    }
+
     startListening() {
         console.log("[AutoSync] 拡張機能からのデータ注入を待機しています...");
         
@@ -65,7 +75,7 @@ class AutoSyncWatcher {
                     if (parsed) {
                         const cats = AutoSyncWatcher.categorizeJson(parsed);
                         if (cats) {
-                            Object.assign(totalUpdates, cats);
+                            AutoSyncWatcher.mergeUpdates(totalUpdates, cats);
                             hasUpdates = true;
                         }
                     }
@@ -76,7 +86,7 @@ class AutoSyncWatcher {
                     if (parsed) {
                         const cats = AutoSyncWatcher.categorizeJson(parsed);
                         if (cats) {
-                            Object.assign(totalUpdates, cats);
+                            AutoSyncWatcher.mergeUpdates(totalUpdates, cats);
                             hasUpdates = true;
                         }
                     }
