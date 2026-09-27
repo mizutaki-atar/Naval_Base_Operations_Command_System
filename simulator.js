@@ -83,6 +83,7 @@ self.onmessage = function(e) {
 
         let currentFleet = cloneFleet(fleet);
         if (currentFleet.length === 0) continue;
+        if (!paths || paths.length === 0) continue;
 
         // ルート分岐の決定
         let rnd = Math.random();
@@ -97,6 +98,10 @@ self.onmessage = function(e) {
         }
 
         let isRetreated = false;
+
+        if (!selectedPath || !selectedPath.nodes) {
+            continue;
+        }
 
         for (let nodeIdx = 0; nodeIdx < selectedPath.nodes.length; nodeIdx++) {
             let node = selectedPath.nodes[nodeIdx];

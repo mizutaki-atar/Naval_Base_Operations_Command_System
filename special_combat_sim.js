@@ -37,11 +37,11 @@ class SpecialCombatSim {
                                     <strong>【主要な対地装備の特性】</strong>
                                     <ul style="margin:4px 0 10px 20px; padding:0;">
                                         <li><span style="color:#000080; font-weight:bold;">三式弾</span><br>
-                                        [メリット] ソフトスキン(飛行場姫など)に対して2.5倍という絶大な倍率を誇ります。戦艦や重巡に積めるため基礎火力が高い。<br>
+                                        [メリット] ソフトスキン(飛行場姫など)に対して2.5倍という絶大な倍率を誇ります。戦艦や重巡に積めるため基礎火力が高い。離島棲姫にも1.75倍の特効があります。<br>
                                         [デメリット] 砲台小鬼には全く特効が乗りません。</li>
                                         <li><span style="color:#000080; font-weight:bold;">WG42 (対地ロケット)</span><br>
                                         [メリット] 全ての陸上型に固定ダメージ(加算)と倍率を与えます。駆逐・軽巡の対地主軸。<br>
-                                        [デメリット] これ単体では倍率が低く、特に集積地などには力不足。2〜3積みで真価を発揮します。</li>
+                                        [デメリット] これ単体では倍率が低く、特に集積地などには力不足。2積みで真価を発揮します（3個目以降は倍率が伸びないため、迫撃砲や四式噴進砲など別系統と組み合わせるのが有効です）。</li>
                                         <li><span style="color:#000080; font-weight:bold;">大発動艇(八九式中戦車) などの戦車系</span><br>
                                         [メリット] 砲台小鬼や離島に対して高い倍率。後述の内火艇と組み合わせることで爆発的なシナジーを生みます。<br>
                                         [デメリット] 搭載できる艦娘が限られます（特定の大発搭載可能艦のみ）。</li>
@@ -49,36 +49,36 @@ class SpecialCombatSim {
                                         [メリット] 砲台や離島に対して単体で2.4倍と最強クラスの倍率。潜水艦にも積めます。<br>
                                         [デメリット] 戦車以上に搭載可能艦が限定されます。</li>
                                         <li><span style="color:#000080; font-weight:bold;">徹甲弾</span><br>
-                                        [メリット] 砲台小鬼と離島棲姫に対して1.85倍の特効。戦艦の昼戦連撃と両立できるのが最大の強み。<br>
+                                        [メリット] 砲台小鬼に対して1.85倍の特効。戦艦の昼戦連撃と両立できるのが最大の強み。<br>
                                         [デメリット] ソフトスキン(飛行場姫)には無効です。</li>
                                     </ul>
                                     
                                     <strong>【対地シナジー（相乗効果）の概念】</strong>
                                     <p style="margin:4px 0 10px 0;">
                                         艦これの対地戦において最も重要なのが<strong>「戦車 ＋ 内火艇」のシナジー</strong>です。<br>
-                                        この2つを同時に積むことで、それぞれの個別倍率に加え、さらに<strong>「シナジー倍率(約1.5倍)」</strong>が乗算されます。<br>
+                                        大発（戦車）系と内火艇は別カテゴリとして扱われるため、両方積むことでそれぞれの特効倍率がそのまま掛け算（乗算）され、単体積みとは比較にならない大ダメージを出せます。<br>
                                         特に「集積地棲姫」に対しては、「ソフトスキン用の倍率」と「集積地専用の倍率」が二重に掛け算される特殊仕様があるため、<br>
-                                        <span style="color:red; font-weight:bold;">WG42 ＋ 戦車 ＋ 内火艇</span> のように積むと、倍率が数十倍に跳ね上がり、昼戦からカンストダメージ（9999）を叩き出します。
+                                        <span style="color:red; font-weight:bold;">WG42 ＋ 戦車 ＋ 内火艇</span> のように積むと、倍率が数十倍に跳ね上がり、昼戦から数千ものオーバーキルダメージを叩き出します。
                                     </p>
 
                                     <strong>【対地特効に向いた艦娘（メリット・デメリット）】</strong>
                                     <ul style="margin:4px 0 0 20px; padding:0;">
-                                        <li><span style="color:#006400; font-weight:bold;">4スロットの軽巡・駆逐 (大淀、Tashkent など)</span><br>
+                                        <li><span style="color:#006400; font-weight:bold;">4スロット以上の軽巡・航巡（夕張改二特、能代改二、矢矧改二、最上改二特 など）</span><br>
                                         [メリット] スロット数の多さを活かし「WG42×2 ＋ 戦車 ＋ 内火艇」といった欲張りフルシナジー装備が可能。対地火力は最強クラス。<br>
-                                        [デメリット] そもそも大淀やTashkentは大発系が積めないためWG42ガン積みに依存する等、艦ごとに搭載制限のジレンマがあります。</li>
+                                        [デメリット] 大淀やTashkentなどは4スロあっても大発系が積めないため、艦ごとの搭載可否の確認が必須です。</li>
                                         <li><span style="color:#006400; font-weight:bold;">大発・内火艇が両方積める駆逐艦 (Верный、霞改二、満潮改二、朝潮改二丁 など)</span><br>
                                         [メリット] 「戦車＋内火艇」の強烈なシナジーを活かせる対地のエース。イベント海域の対地ボスでは必須級です。<br>
                                         [デメリット] 夜戦連撃（主砲2）と対地シナジーを両立させるにはスロットが足りず、道中の水上艦隊相手には弱くなりがちです。</li>
-                                        <li><span style="color:#006400; font-weight:bold;">水上機母艦 (日進、Commandant Teste など)</span><br>
+                                        <li><span style="color:#006400; font-weight:bold;">水上機母艦（日進 など）</span><br>
                                         [メリット] 大発系が積める上に4スロットあるため、昼戦連撃と対地シナジーを両立できる最強の対地要員。<br>
-                                        [デメリット] 装甲や回避が低く、ボス到達前に大破しやすいのが弱点です。</li>
+                                        [デメリット] 装甲や回避が低く、ボス到達前に大破しやすいのが弱点です。※同じ4スロ水母でもCommandant Testeは主砲（昼連撃）や内火艇が積めないなど、艦によって制限が異なります。</li>
                                     </ul>
                                 </div>
                             </details>
 
                             <strong>【パズルカスタマイズ】</strong><br>
                             保有している艦娘・装備は「[保有]」マークが付き上部に表示されます。未保有のものも検証のために選択可能です。<br>
-                            ※集積地棲姫へのダメージは「ソフトスキン倍率 × 集積地固有倍率」で爆発的に跳ね上がります。<br><br>
+                            ※集積地棲姫へのダメージは「キャップ前補正（ソフトスキン倍率＋固定加算）」で攻撃力キャップ計算を行った後、さらに「キャップ後補正（集積地固有倍率）」が乗算されるため爆発的に跳ね上がります。<br><br>
                             
                             <div style="font-size:11px; color:#555; background:#eee; padding:8px; border-radius:4px; border:1px solid #ccc;">
                                 <strong>※当シミュレーターの計算根拠および参考文献（注釈）</strong><br>
@@ -136,12 +136,8 @@ class SpecialCombatSim {
             return Number(a.key) - Number(b.key);
         });
         
-        this.shipOptionsHTML = '<option value="">-- 艦娘を選択 --</option>';
-        allShips.forEach(s => {
-            const isOwned = ownedShipIds.has(String(s.key)) || ownedShipIds.has(String(s.id));
-            const mark = isOwned ? '[保有]' : '[未]';
-            this.shipOptionsHTML += `<option value="${s.key}">${mark} ${s.name} (${s.type_name})</option>`;
-        });
+        SpecialCombatSim.allShips = allShips;
+        SpecialCombatSim.ownedShipIds = ownedShipIds;
 
         // 装備リスト作成
         let allItems = Object.entries(MasterData.Items).map(([k, v]) => Object.assign({ key: k }, v));
@@ -153,12 +149,8 @@ class SpecialCombatSim {
             return Number(a.key) - Number(b.key);
         });
         
-        this.itemOptionsHTML = '<option value="">-- 装備なし --</option>';
-        allItems.forEach(i => {
-            const isOwned = ownedItemIds.has(String(i.key)) || ownedItemIds.has(String(i.id));
-            const mark = isOwned ? '[保有]' : '[未]';
-            this.itemOptionsHTML += `<option value="${i.key}">${mark} ${i.name}</option>`;
-        });
+        SpecialCombatSim.allItems = allItems;
+        SpecialCombatSim.ownedItemIds = ownedItemIds;
     }
 
     static addPuzzleRow() {
@@ -169,15 +161,15 @@ class SpecialCombatSim {
         const html = `
             <div id="${rowId}" style="background:#fff; border:1px solid #ccc; padding:8px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <select class="classic-select puzzle-ship" style="width:250px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.shipOptionsHTML}</select>
+                    <button class="classic-button puzzle-ship" data-value="" style="width:250px; text-align:left;" onclick="SpecialCombatSim.openShipSelector('${rowId}')">-- 艦娘を選択 --</button>
                     <button class="classic-button" style="color:red; padding:0 8px;" onclick="document.getElementById('${rowId}').remove()">X</button>
                 </div>
                 <div style="display:flex; gap:5px; margin-bottom:5px;">
-                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
-                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
-                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
-                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
-                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
+                    <button class="classic-button puzzle-equip" data-value="" style="width:140px; text-align:left; font-size:11px;" onclick="SpecialCombatSim.openEquipSelector('${rowId}', 0)">-- 装備なし --</button>
+                    <button class="classic-button puzzle-equip" data-value="" style="width:140px; text-align:left; font-size:11px;" onclick="SpecialCombatSim.openEquipSelector('${rowId}', 1)">-- 装備なし --</button>
+                    <button class="classic-button puzzle-equip" data-value="" style="width:140px; text-align:left; font-size:11px;" onclick="SpecialCombatSim.openEquipSelector('${rowId}', 2)">-- 装備なし --</button>
+                    <button class="classic-button puzzle-equip" data-value="" style="width:140px; text-align:left; font-size:11px;" onclick="SpecialCombatSim.openEquipSelector('${rowId}', 3)">-- 装備なし --</button>
+                    <button class="classic-button puzzle-equip" data-value="" style="width:140px; text-align:left; font-size:11px;" onclick="SpecialCombatSim.openEquipSelector('${rowId}', 4)">-- 装備なし --</button>
                 </div>
                 <div id="${rowId}-result" style="background:#f0f0f0; padding:5px; font-size:12px;">艦娘を選択してください。</div>
             </div>
@@ -185,12 +177,183 @@ class SpecialCombatSim {
         container.insertAdjacentHTML('beforeend', html);
     }
 
+    static openShipSelector(rowId) {
+        const modalId = 'puzzle-ship-modal';
+        let modal = document.getElementById(modalId);
+        if (modal) modal.remove();
+
+        const html = `
+            <div id="${modalId}" style="position:fixed; top:5%; left:20%; width:60%; z-index:9999;">
+                <div class="classic-window">
+                    <div class="classic-titlebar">
+                        <span>艦娘検索</span>
+                        <button class="classic-button" style="padding:0 2px; height:16px; line-height:10px;" onclick="document.getElementById('${modalId}').remove()">X</button>
+                    </div>
+                    <div class="classic-content" style="background-color:#d4d0c8; padding:4px;">
+                        <div style="margin-bottom:4px; display:flex; gap:4px; align-items:center;">
+                            <input type="text" id="puzzle-ship-search" class="classic-input" placeholder="名前検索..." onkeyup="SpecialCombatSim.updateShipModalList('${rowId}')" style="width:120px;">
+                            <select id="puzzle-ship-type" class="classic-input" onchange="SpecialCombatSim.updateShipModalList('${rowId}')">
+                                <option value="">全艦種</option>
+                                <option value="駆逐">駆逐</option>
+                                <option value="軽巡">軽巡/雷巡</option>
+                                <option value="重巡">重巡/航巡</option>
+                                <option value="戦艦">戦艦</option>
+                                <option value="空母">空母(軽・正・装)</option>
+                                <option value="水母">水母</option>
+                                <option value="潜水">潜水艦</option>
+                            </select>
+                            <label><input type="checkbox" id="puzzle-ship-owned" onchange="SpecialCombatSim.updateShipModalList('${rowId}')"> 保有のみ</label>
+                        </div>
+                        <div id="puzzle-ship-list" style="background-color:#ffffff; height:350px; overflow-y:scroll; border:2px inset white;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', html);
+        this.updateShipModalList(rowId);
+    }
+    
+    static updateShipModalList(rowId) {
+        const text = document.getElementById('puzzle-ship-search').value.toLowerCase();
+        const type = document.getElementById('puzzle-ship-type').value;
+        const ownedOnly = document.getElementById('puzzle-ship-owned').checked;
+        const container = document.getElementById('puzzle-ship-list');
+        
+        let filtered = this.allShips.filter(s => {
+            if (text && !s.name.toLowerCase().includes(text)) return false;
+            if (type && !s.type_name.includes(type)) {
+                if (type === '軽巡' && !s.type_name.includes('雷巡') && !s.type_name.includes('練巡')) return false;
+                if (type === '空母' && !(s.type_name.includes('空母') || s.type_name.includes('装甲'))) return false;
+                if (type !== '軽巡' && type !== '空母' && !s.type_name.includes(type)) return false;
+            }
+            if (ownedOnly && !this.ownedShipIds.has(String(s.key)) && !this.ownedShipIds.has(String(s.id))) return false;
+            return true;
+        });
+        
+        let html = '';
+        filtered.forEach(s => {
+            const isOwned = this.ownedShipIds.has(String(s.key)) || this.ownedShipIds.has(String(s.id));
+            const mark = isOwned ? '<span style="color:blue;">[保有]</span>' : '<span style="color:gray;">[未]</span>';
+            html += `<div style="padding:2px 4px; border-bottom:1px solid #eee; cursor:pointer;" onclick="SpecialCombatSim.selectShip('${rowId}', '${s.key}', '${s.name.replace(/'/g, "\\'")}')">${mark} ${s.name} <span style="font-size:10px; color:#888;">(${s.type_name})</span></div>`;
+        });
+        container.innerHTML = html;
+    }
+    
+    static selectShip(rowId, shipKey, shipName) {
+        const row = document.getElementById(rowId);
+        if (row) {
+            const btn = row.querySelector('.puzzle-ship');
+            if (btn) {
+                btn.dataset.value = shipKey;
+                let shortName = shipName;
+                if (shortName.length > 20) shortName = shortName.substring(0, 20) + '...';
+                btn.innerText = shortName;
+                btn.title = shipName;
+            }
+            this.calcPuzzleRow(rowId);
+        }
+        document.getElementById('puzzle-ship-modal').remove();
+    }
+    
+    static openEquipSelector(rowId, eqIndex) {
+        const modalId = 'puzzle-equip-modal';
+        let modal = document.getElementById(modalId);
+        if (modal) modal.remove();
+
+        const html = `
+            <div id="${modalId}" style="position:fixed; top:10%; left:25%; width:50%; z-index:9999;">
+                <div class="classic-window">
+                    <div class="classic-titlebar">
+                        <span>装備検索</span>
+                        <button class="classic-button" style="padding:0 2px; height:16px; line-height:10px;" onclick="document.getElementById('${modalId}').remove()">X</button>
+                    </div>
+                    <div class="classic-content" style="background-color:#d4d0c8; padding:4px;">
+                        <div style="margin-bottom:4px; display:flex; gap:4px; align-items:center;">
+                            <input type="text" id="puzzle-equip-search" class="classic-input" placeholder="名前検索..." onkeyup="SpecialCombatSim.updateEquipModalList('${rowId}', ${eqIndex})" style="width:120px;">
+                            <select id="puzzle-equip-type" class="classic-input" onchange="SpecialCombatSim.updateEquipModalList('${rowId}', ${eqIndex})">
+                                <option value="">全カテゴリ</option>
+                                <option value="主砲">主砲</option>
+                                <option value="魚雷">魚雷</option>
+                                <option value="機銃">機銃</option>
+                                <option value="電探">電探</option>
+                                <option value="水上機">水上機</option>
+                                <option value="艦載機">艦載機</option>
+                                <option value="対地">対地(ロケット/戦車/内火艇)</option>
+                                <option value="その他">その他</option>
+                            </select>
+                            <label><input type="checkbox" id="puzzle-equip-owned" onchange="SpecialCombatSim.updateEquipModalList('${rowId}', ${eqIndex})"> 保有のみ</label>
+                        </div>
+                        <div id="puzzle-equip-list" style="background-color:#ffffff; height:350px; overflow-y:scroll; border:2px inset white;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', html);
+        this.updateEquipModalList(rowId, eqIndex);
+    }
+    
+    static updateEquipModalList(rowId, eqIndex) {
+        const text = document.getElementById('puzzle-equip-search').value.toLowerCase();
+        const type = document.getElementById('puzzle-equip-type').value;
+        const ownedOnly = document.getElementById('puzzle-equip-owned').checked;
+        const container = document.getElementById('puzzle-equip-list');
+        
+        let filtered = this.allItems.filter(i => {
+            if (text && !i.name.toLowerCase().includes(text)) return false;
+            if (type) {
+                const typeName = MasterData.EquipTypes[i.type?.[2]]?.name || "";
+                if (type === '主砲' && !typeName.includes('主砲')) return false;
+                if (type === '魚雷' && !typeName.includes('魚雷') && !typeName.includes('潜航艇')) return false;
+                if (type === '機銃' && !typeName.includes('機銃')) return false;
+                if (type === '電探' && !typeName.includes('電探')) return false;
+                if (type === '水上機' && !typeName.includes('水上')) return false;
+                if (type === '艦載機' && !(typeName.includes('艦戦') || typeName.includes('艦爆') || typeName.includes('艦攻') || typeName.includes('艦偵'))) return false;
+                if (type === '対地') {
+                    if (!i.name.includes('WG42') && !i.name.includes('迫撃砲') && !i.name.includes('戦車') && !i.name.includes('内火艇') && !i.name.includes('陸戦隊') && !i.name.includes('噴進砲')) return false;
+                }
+                if (type === 'その他') {
+                    if (typeName.includes('主砲') || typeName.includes('魚雷') || typeName.includes('機銃') || typeName.includes('電探') || typeName.includes('水上') || typeName.includes('艦戦') || typeName.includes('艦爆') || typeName.includes('艦攻')) return false;
+                }
+            }
+            if (ownedOnly && !this.ownedItemIds.has(String(i.key)) && !this.ownedItemIds.has(String(i.id))) return false;
+            return true;
+        });
+        
+        let html = `<div style="padding:2px 4px; border-bottom:1px solid #eee; cursor:pointer;" onclick="SpecialCombatSim.selectEquip('${rowId}', ${eqIndex}, '', '-- 装備なし --')"><span style="color:gray;">[外す]</span> -- 装備なし --</div>`;
+        filtered.forEach(i => {
+            const isOwned = this.ownedItemIds.has(String(i.key)) || this.ownedItemIds.has(String(i.id));
+            const mark = isOwned ? '<span style="color:blue;">[保有]</span>' : '<span style="color:gray;">[未]</span>';
+            const typeName = MasterData.EquipTypes[i.type?.[2]]?.name || "不明";
+            html += `<div style="padding:2px 4px; border-bottom:1px solid #eee; cursor:pointer;" onclick="SpecialCombatSim.selectEquip('${rowId}', ${eqIndex}, '${i.key}', '${i.name.replace(/'/g, "\\'")}')">${mark} ${i.name} <span style="font-size:10px; color:#888;">(${typeName})</span></div>`;
+        });
+        container.innerHTML = html;
+    }
+    
+    static selectEquip(rowId, eqIndex, eqKey, eqName) {
+        const row = document.getElementById(rowId);
+        if (row) {
+            const btns = row.querySelectorAll('.puzzle-equip');
+            if (btns[eqIndex]) {
+                btns[eqIndex].dataset.value = eqKey;
+                let shortName = eqName;
+                if (shortName.length > 10) shortName = shortName.substring(0, 10) + '...';
+                btns[eqIndex].innerText = shortName;
+                btns[eqIndex].title = eqName;
+            }
+            this.calcPuzzleRow(rowId);
+        }
+        document.getElementById('puzzle-equip-modal').remove();
+    }
+
     static calcPuzzleRow(rowId) {
         const row = document.getElementById(rowId);
         const resDiv = document.getElementById(rowId + '-result');
         if (!row || !resDiv) return;
 
-        const shipId = row.querySelector('.puzzle-ship').value;
+        const shipBtn = row.querySelector('.puzzle-ship');
+        const shipId = shipBtn.value || shipBtn.dataset.value;
         if (!shipId) {
             resDiv.innerHTML = '艦娘を選択してください。';
             return;
@@ -208,7 +371,7 @@ class SpecialCombatSim {
 
         const equips = row.querySelectorAll('.puzzle-equip');
         equips.forEach(eq => {
-            const eid = eq.value;
+            const eid = eq.value || eq.dataset.value;
             if (!eid) return;
             const mstItem = MasterData.Items[eid];
             if (!mstItem) return;
@@ -244,7 +407,7 @@ class SpecialCombatSim {
         if (apShellCount > 0) {
             softPre *= 1.0;
             pillPre *= 1.85;
-            islPre *= 1.85;
+            islPre *= 1.0;
         }
 
         // --- 水上爆撃機 ---
@@ -318,11 +481,7 @@ class SpecialCombatSim {
         }
 
         // --- 上陸用舟艇のシナジー ---
-        if (tankCount > 0 && kamiCount > 0) {
-            pillPre *= 1.5;
-            islPre *= 1.5;
-            depPost *= 1.25; 
-        }
+        // (個別の倍率が乗算されるため、特有の一律シナジー倍率は撤廃)
 
         const formatResult = (multi, add, postMulti = 1.0) => {
             if (multi === 1.0 && add === 0 && postMulti === 1.0) return '-';
@@ -347,7 +506,7 @@ class SpecialCombatSim {
                     <th style="border-bottom:1px solid #ccc; width:25%;">ソフトスキン<br>(飛行場姫)</th>
                     <th style="border-bottom:1px solid #ccc; width:25%;">砲台小鬼</th>
                     <th style="border-bottom:1px solid #ccc; width:25%;">離島棲姫</th>
-                    <th style="border-bottom:1px solid #ccc; width:25%;">集積地棲姫<br>(乗算)</th>
+                    <th style="border-bottom:1px solid #ccc; width:25%;">集積地棲姫</th>
                 </tr>
                 <tr>
                     <td>${formatResult(softPre, softAdd)}</td>
