@@ -381,7 +381,6 @@ class MapStrategyOptimizer {
             if (m.name.includes('機銃')) return '対空機銃';
             return m.name || "";
         };
-
         let currentShipId = null;
 
         const evaluateCombination = (shipMaster, uids, isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS) => {
@@ -477,293 +476,6 @@ class MapStrategyOptimizer {
         };
 
         fleet.forEach(s => {
-            s.optimalEquips = Array(s.master.slots || 3).fill(-1);
-            s.equipNames = [];
-        });
-
-        let equipLogs = [];
-        let equippedDrums = 0;
-        let equippedDrumsShips = 0;
-        let daihatsuCount = 0;
-
-        if (expData.drums) {
-            if (availableDrums.length < expData.drums.total) return { error: `ドラム缶が足りません (必要:${expData.drums.total})` };
-            
-            let eligibleShips = fleet.filter(s => s.master.slots > 0);
-            if (eligibleShips.length < expData.drums.ships) return { error: `ドラム缶を積める艦が足りません(必要:${expData.drums.ships}隻)` };
-            
-            for (let i = 0; i < expData.drums.ships; i++) {
-                eligibleShips[i].optimalEquips[0] = availableDrums.shift().uid;
-                eligibleShips[i].equipNames.push('ドラム缶');
-                equippedDrums++;
-                equippedDrumsShips++;
-            }
-            
-            while (equippedDrums < expData.drums.total) {
-                let equipped = false;
-                for (let s of eligibleShips) {
-                    let emptySlot = s.optimalEquips.indexOf(-1);
-                    if (emptySlot !== -1) {
-                        s.optimalEquips[emptySlot] = availableDrums.shift().uid;
-                        s.equipNames.push('ドラム缶');
-                        equippedDrums++;
-                        equipped = true;
-                        break;
-                    }
-                }
-                if (!equipped) return { error: `ドラム缶を積む空きスロットが足りません` };
-            }
-            equipLogs.push(`ドラム缶を ${equippedDrumsShips}隻 に計 ${equippedDrums}個 搭載しました`);
-        }
-
-        if (policy === 'max_profit') {
-            let eligibleShips = fleet.filter(s => s.d_cap);
-            for (let s of eligibleShips) {
-                while (daihatsuCount < 4 && availableDaihatsu.length > 0) {
-                    let emptySlot = s.optimalEquips.indexOf(-1);
-                    if (emptySlot !== -1) {
-                        s.optimalEquips[emptySlot] = availableDaihatsu.shift().uid;
-                        s.equipNames.push('大発系');
-                        daihatsuCount++;
-                    } else {
-                        break;
-                    }
-                }
-            }
-            if (daihatsuCount > 0) equipLogs.push(`大発動艇系を ${daihatsuCount}個 搭載しました`);
-        }
-
-        if (expData.req_stats) {
-            let sumAa = fleet.reduce((sum, s) => sum + s.stats.aa, 0);
-            let sumAsw = fleet.reduce((sum, s) => sum + s.stats.asw, 0);
-            let sumLos = fleet.reduce((sum, s) => sum + s.stats.los, 0);
-            
-            let reqAa = expData.req_stats.aa || 0;
-            let reqAsw = expData.req_stats.asw || 0;
-            let reqLos = expData.req_stats.los || 0;
-
-            if (sumAa < reqAa || sumAsw < reqAsw || sumLos < reqLos) {
-                return { error: `ステータス条件が足りません(対空:${sumAa}/${reqAa}, 対潜:${sumAsw}/${reqAsw}, 索敵:${sumLos}/${reqLos})` };
-            }
-        }
-
-        let bonus = 1.0 + (daihatsuCount * 0.05);
-        let baseFuel = expData.fuel || 0;
-        let baseAmmo = expData.ammo || 0;
-        let baseSteel = expData.steel || 0;
-        let baseBaux = expData.baux || 0;
-        
-
-        let grossFuel = Math.floor(baseFuel * 1.5 * bonus);
-        let grossAmmo = Math.floor(baseAmmo * 1.5 * bonus);
-        let grossSteel = Math.floor(baseSteel * 1.5 * bonus);
-        let grossBaux = Math.floor(baseBaux * 1.5 * bonus);
-
-        let costFuel = Math.floor(fleet.reduce((sum, s) => sum + s.master.fuel, 0) * useFuel);
-        let costAmmo = Math.floor(fleet.reduce((sum, s) => sum + s.master.ammo, 0) * useAmmo);
-        
-        let expTime = expData.time || 60;
-
-        let advices = [];
-        advices.push("💡 【大成功の確定】 全艦をキラキラ状態（コンディション50以上）にして送り出すと、報酬が1.5倍になる「大成功」がほぼ確定します。");
-        if (daihatsuCount < 4 && policy === 'max_profit') {
-            advices.push(`💡 【獲得量アップ】 「大発動艇」系の装備があと ${4 - daihatsuCount} 個あれば、報酬の装備ボーナスを上限（+20%）まで引き上げられます。`);
-        } else if (daihatsuCount === 4) {
-            advices.push("💡 【獲得量アップ】 大発系を4つ積んでおり通常の上限（+20%）に達しています。「特大発動艇」を混ぜることでさらにボーナスを限界突破できます。");
-        }
-
-        return {
-            fleet: fleet,
-            equipLogs: equipLogs,
-            advices: advices,
-            bonusPercent: (daihatsuCount * 5),
-            profit: { fuel: grossFuel - costFuel, ammo: grossAmmo - costAmmo, steel: grossSteel, baux: grossBaux },
-            hourly: { fuel: Math.floor((grossFuel - costFuel) / (expTime / 60)), ammo: Math.floor((grossAmmo - costAmmo) / (expTime / 60)) }
-        };
-    }
-}
-
-class QuestChecker {
-    constructor(userData) {
-        this.ships = userData.ships || [];
-    }
-
-    checkAll() {
-        return MasterData.Quests.map(q => this.check(q));
-    }
-
-    check(quest) {
-        let status = 'ready'; // ready, partial, missing
-        let msgs = [];
-
-        if (quest.req_ships) {
-            let foundCount = 0;
-            let partialFound = false;
-
-            for (const reqName of quest.req_ships) {
-                // 完全一致（改二などを要求している場合）
-                const exactMatch = this.ships.find(s => s.name === reqName);
-                if (exactMatch) {
-                    foundCount++;
-                } else {
-                    // 部分一致（改装前の艦を持っているか）
-                    const baseName = reqName.replace(/改二.*$/, '').replace(/改$/, '');
-                    const baseMatch = this.ships.find(s => s.name.startsWith(baseName));
-                    if (baseMatch) {
-                        msgs.push(`⚠️ ${reqName} が必要ですが、現在 ${baseMatch.name} (Lv${baseMatch.lv}) です（育成中）`);
-                        partialFound = true;
-                    } else {
-                        msgs.push(`❌ 未所持: ${reqName}`);
-                    }
-                }
-            }
-            if (foundCount === quest.req_ships.length) status = 'ready';
-            else if (foundCount > 0 || partialFound) status = 'partial';
-            else status = 'missing';
-        }
-
-        if (quest.req_ships_any) {
-            let foundCount = 0;
-            for (const reqName of quest.req_ships_any) {
-                if (this.ships.some(s => s.name.startsWith(reqName.replace(/改.*$/, '')))) foundCount++;
-            }
-            if (foundCount >= quest.req_count) status = 'ready';
-            else if (foundCount > 0) {
-                status = 'partial';
-                msgs.push(`⚠️ 指定艦から ${quest.req_count} 隻必要ですが、現在 ${foundCount} 隻です`);
-            } else {
-                status = 'missing';
-                msgs.push(`❌ 指定艦が全く足りません`);
-            }
-        }
-
-        let advices = [];
-        if (quest.name) {
-            if (quest.name.includes("い号")) advices.push("💡 【消化のコツ】 空母(軽空母含む)20隻の撃沈が必要です。2-1（南西諸島哨戒）や 2-2（バシー海峡）の周回が時間・資源効率が良くおすすめです。");
-            if (quest.name.includes("ろ号")) advices.push("💡 【消化のコツ】 補給艦50隻の撃沈が必要です。2-2（バシー海峡）の下ルートや、5-3-P、あるいはイベント海域での消化が一般的です。");
-            if (quest.name.includes("海上護衛戦")) advices.push("💡 【消化のコツ】 潜水艦15隻の撃沈が必要です。1-5（鎮守府近海）や 7-1（ブルネイ泊地）を回るのが最適解です。");
-            if (quest.name.includes("あ号")) advices.push("💡 【消化のコツ】 ボス到達24回、ボス勝利12回など数が多いです。1-1キラ付けのついでや、1-5周回などで気長に進めましょう。");
-        }
-
-        return { quest, status, msgs, advices };
-    }
-}
-
-class MapStrategyOptimizer {
-    constructor(userData) {
-        this.ships = userData.ships || [];
-        this.items = userData.items || [];
-    }
-
-    buildFleet(mapId) {
-        let strategy = MasterData.MapStrategies[mapId];
-        
-        // データがない海域の場合の汎用フォールバック
-        if (!strategy) {
-            strategy = {
-                name: mapId + " (汎用編成)",
-                requirements: "未知の海域のため汎用編成",
-                stypes: ['ANY', 'ANY', 'ANY', 'ANY', 'ANY', 'ANY'],
-                desc: "海域の戦術データが不足しているため、手持ちの高レベル艦を順番に配置した汎用編成です。昼戦重視の装備を自動設定します。"
-            };
-        }
-
-        let fleet = [];
-        let availableShips = [...this.ships].sort((a, b) => b.lv - a.lv);
-
-        for (const reqStype of strategy.stypes) {
-            const idx = availableShips.findIndex(s => {
-                if (reqStype === 'ANY') return true;
-                const master = MasterData.Ships[s.id];
-                return master && MasterData.matchStype(master.type_name, reqStype);
-            });
-            if (idx !== -1) fleet.push(availableShips.splice(idx, 1)[0]);
-            else {
-                // ANY指定以外で足りない場合はエラーではなく妥協して編成を続ける
-                if (reqStype !== 'ANY') {
-                    const fallbackIdx = availableShips.findIndex(s => true);
-                    if (fallbackIdx !== -1) fleet.push(availableShips.splice(fallbackIdx, 1)[0]);
-                }
-            }
-        }
-
-        // 装備の最適アサインロジック
-        let availableItems = [...this.items];
-        let equipMap = {};
-
-        // マス構成から特化戦術を推測
-        const mapDesc = (strategy.desc || "") + " " + (strategy.requirements || "");
-        const isASWMap = mapDesc.includes("対潜");
-        const needsAA = mapDesc.includes("対空") || mapDesc.includes("空母");
-        const needsLOS = mapDesc.includes("索敵");
-        const isNightMap = mapDesc.includes("夜戦");
-
-        // 装備種別の文字列推論ヘルパー
-        const getEquipTypeStr = (m) => {
-            if (!m) return "";
-            if (typeof m.typeName === 'string' && m.typeName !== "不明") return m.typeName;
-            const tId = m.type && m.type[2] ? m.type[2] : m.typeName;
-            if (tId === 1) return '小口径主砲';
-            if (tId === 2) return '中口径主砲';
-            if (tId === 3) return '大口径主砲';
-            if (tId === 4) return '副砲';
-            if (tId === 5) return '魚雷';
-            if (tId === 6 || tId === 7 || tId === 8 || tId === 57) return '艦上戦闘機';
-            if (tId === 9 || tId === 10 || tId === 59) return '艦上爆撃機';
-            if (tId === 11 || tId === 41 || tId === 58) return '艦上攻撃機';
-            if (tId === 12) return '小型電探';
-            if (tId === 13) return '大型電探';
-            if (tId === 17) return '水上偵察機';
-            if (tId === 18) return '水上爆撃機';
-            if (tId === 19) return '徹甲弾';
-            if (tId === 14 || tId === 40 || m.name.includes('ソナー') || m.name.includes('探信儀') || m.name.includes('聴音機')) return 'ソナー';
-            if (tId === 15 || m.name.includes('投射機')) return '爆雷投射機';
-            if (tId === 43 || (m.name.includes('爆雷') && !m.name.includes('投射機'))) return '爆雷';
-            if (m.name.includes('機銃')) return '対空機銃';
-            return m.name || "";
-        };
-
-        let currentShipId = null;
-
-        // 装備プールから最強のものを検索して取り出すヘルパー
-        const popBestItem = (keywords, excludeKeywords = []) => {
-            let bestIdx = -1;
-            let bestStat = -1;
-            for (let i = 0; i < availableItems.length; i++) {
-                const it = availableItems[i];
-                const master = MasterData.Items[it.id];
-                if (!master) continue;
-                
-                const typeStr = getEquipTypeStr(master);
-                
-                if (!keywords.some(kw => typeStr.includes(kw) || master.name.includes(kw))) continue;
-                if (excludeKeywords.some(kw => typeStr.includes(kw) || master.name.includes(kw))) continue;
-                if (currentShipId && !MasterData.canEquip(currentShipId, master.id)) continue;
-                
-                // マップ傾向に基づく評価値算出
-                let score = (master.fire || 0)*2 + (master.torp || 0)*1.5 + (master.armor || 0);
-                
-                if (isASWMap) score += (master.asw || 0) * 10;
-                else score += (master.asw || 0) * 0.5;
-                
-                if (needsAA) score += (master.aa || 0) * 5;
-                else score += (master.aa || 0) * 1;
-                
-                if (needsLOS) score += (master.los || 0) * 5;
-                else score += (master.los || 0) * 1;
-                
-                if (score > bestStat) {
-                    bestStat = score;
-                    bestIdx = i;
-                }
-            }
-            if (bestIdx !== -1) {
-                return availableItems.splice(bestIdx, 1)[0].uid;
-            }
-            return -1;
-        };
-
-        fleet.forEach(s => {
             currentShipId = s.id;
             const master = MasterData.Ships[s.id];
             if (!master) return;
@@ -776,60 +488,58 @@ class MapStrategyOptimizer {
 
             if (MasterData.matchStype(stype, "駆逐") || MasterData.matchStype(stype, "海防艦")) {
                 if (isASWMap) {
-                    assignedEquips = assignEquipsByTemplates([['ソナー'], ['爆雷投射機'], ['爆雷', 'ソナー']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (isAntiInst) {
-                    assignedEquips = assignEquipsByTemplates([['内火艇'], ['陸戦隊', '戦車'], ['WG42', '迫撃砲']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (isNightMap) {
                     // 魚魚水CI または 主魚電CI を狙う
-                    assignedEquips = assignEquipsByTemplates([['魚雷'], ['魚雷'], ['見張員', '電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (needsAA) {
-                    assignedEquips = assignEquipsByTemplates([['小口径主砲', '高角砲'], ['小口径主砲', '高角砲'], ['対空機銃', '電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else {
-                    assignedEquips = assignEquipsByTemplates([['小口径主砲', '12.7cm連装砲D型'], ['小口径主砲', '12.7cm連装砲D型'], ['電探', '魚雷']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 }
             } else if (MasterData.matchStype(stype, "軽巡") || MasterData.matchStype(stype, "雷巡")) {
                 if (isASWMap) {
-                    assignedEquips = assignEquipsByTemplates([['ソナー'], ['爆雷投射機'], ['爆雷', 'ソナー', '水上偵察機']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (isAntiInst) {
-                    assignedEquips = assignEquipsByTemplates([['内火艇'], ['陸戦隊', '戦車'], ['WG42', '迫撃砲']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (isNightMap) {
-                    assignedEquips = assignEquipsByTemplates([['魚雷'], ['魚雷'], ['甲標的', '見張員']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (needsAA) {
-                    assignedEquips = assignEquipsByTemplates([['中口径主砲', '小口径主砲'], ['中口径主砲', '小口径主砲'], ['対空機銃', '電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else {
-                    assignedEquips = assignEquipsByTemplates([['中口径主砲', '小口径主砲'], ['中口径主砲', '小口径主砲'], ['水上偵察機', '甲標的', '電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 }
             } else if (MasterData.matchStype(stype, "戦艦")) {
                 // 特殊砲撃(タッチ)対応艦なら徹甲弾+電探を最優先
                 if (s.name.match(/大和|長門|陸奥|Nelson|Colorado/)) {
-                    assignedEquips = assignEquipsByTemplates([['大口径主砲'], ['大口径主砲'], ['徹甲弾'], ['大型電探', '水上電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (isAntiInst) {
-                    assignedEquips = assignEquipsByTemplates([['大口径主砲'], ['大口径主砲'], ['三式弾'], ['徹甲弾', '水上偵察機']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (needsAA) {
-                    assignedEquips = assignEquipsByTemplates([['大口径主砲'], ['大口径主砲'], ['三式弾', '徹甲弾'], ['水上偵察機', '水上観測機', '電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else {
-                    assignedEquips = assignEquipsByTemplates([['大口径主砲'], ['大口径主砲'], ['水上偵察機', '水上観測機'], ['徹甲弾', '電探']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 }
             } else if (MasterData.matchStype(stype, "空母")) {
                 if (isNightMap) {
                     // 夜襲CI: 夜戦 + 夜攻 + FBA
-                    assignedEquips = assignEquipsByTemplates([['夜間戦闘機', '艦上戦闘機'], ['夜間攻撃機', '艦上攻撃機'], ['艦上爆撃機'], ['夜間作戦航空要員', '艦上戦闘機']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else if (needsAA) {
-                    assignedEquips = assignEquipsByTemplates([['艦上戦闘機'], ['艦上戦闘機'], ['艦上攻撃機', '艦上爆撃機'], ['艦上戦闘機', '彩雲']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else {
                     // FBA (戦爆連合)
-                    assignedEquips = assignEquipsByTemplates([['艦上攻撃機'], ['艦上爆撃機'], ['艦上戦闘機'], ['艦上戦闘機', '彩雲']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 }
             } else if (MasterData.matchStype(stype, "重巡") || MasterData.matchStype(stype, "航巡")) {
                 if (isAntiInst) {
-                    assignedEquips = assignEquipsByTemplates([['中口径主砲'], ['中口径主砲'], ['三式弾'], ['WG42', '水上爆撃機']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 } else {
-                    assignedEquips = assignEquipsByTemplates([['中口径主砲'], ['中口径主砲'], ['水上偵察機', '水上爆撃機'], ['三式弾', '電探', '徹甲弾']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                    assignedEquips = assignEquipsByTemplates([, , , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
                 }
-            } else if (MasterData.matchStype(stype, "水上機母艦") || MasterData.matchStype(stype, "水母")) {
-                assignedEquips = assignEquipsByTemplates([['水上爆撃機'], ['甲標的', '水上爆撃機'], ['水上爆撃機', '電探', '水上偵察機']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
             } else {
-                assignedEquips = assignEquipsByTemplates([['主砲'], ['主砲'], ['電探', '水上偵察機']], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
+                assignedEquips = assignEquipsByTemplates([, , ], isNightMap, isASWMap, isAntiInst, mapDesc, needsAA, needsLOS);
             }
 
             // 長さをスロット数に合わせる、足りない部分は -1、スロット数以上の場合は切り捨て
