@@ -540,16 +540,22 @@ class SpecialCombatSim {
             setTimeout(() => {
                 const row = document.getElementById(rowId);
                 if (!row) return;
-                const sSelect = row.querySelector('.puzzle-ship');
-                if (sSelect) sSelect.value = shipData.api_ship_id;
+                const sBtn = row.querySelector('.puzzle-ship');
+                if (sBtn) {
+                    sBtn.dataset.value = shipData.api_ship_id;
+                    const mstShip = MasterData.Ships[shipData.api_ship_id];
+                    sBtn.textContent = `Lv.${shipData.api_lv || '?'} ${mstShip ? mstShip.name : '??'}`;
+                }
 
-                const eSelects = row.querySelectorAll('.puzzle-equip');
+                const eBtns = row.querySelectorAll('.puzzle-equip');
                 fShip.equips.forEach((itemId, idx) => {
-                    if (idx >= eSelects.length) return;
+                    if (idx >= eBtns.length) return;
                     if (itemId === -1 || itemId === 0) return;
                     const itemData = AppState.userData.items[itemId] || AppState.userData.items.find(i => i.api_id === itemId);
                     if (itemData) {
-                        eSelects[idx].value = itemData.api_slotitem_id;
+                        eBtns[idx].dataset.value = itemData.api_slotitem_id;
+                        const mstItem = MasterData.Items[itemData.api_slotitem_id];
+                        eBtns[idx].textContent = mstItem ? mstItem.name : '??';
                     }
                 });
                 
@@ -564,14 +570,15 @@ class SpecialCombatSim {
         const html = `
             <div id="${rowId}" style="background:#fff; border:1px solid #ccc; padding:8px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <select class="classic-select puzzle-ship" style="width:250px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.shipOptionsHTML}</select>
+                    <button class="classic-button puzzle-ship" data-value="" style="width:250px; text-align:left;" onclick="SpecialCombatSim.openShipSelector('${rowId}')">-- 艦娘を選択 --</button>
                     <button class="classic-button" style="color:red; padding:0 8px;" onclick="document.getElementById('${rowId}').remove()">X</button>
                 </div>
                 <div style="display:flex; gap:5px; margin-bottom:5px;">
-                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
-                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
-                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
-                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
+                    <button class="classic-button puzzle-equip" data-value="" style="width:140px; text-align:left; font-size:11px;" onclick="SpecialCombatSim.openEquipSelector('${rowId}', 0)">-- 装備なし --</button>
+                    <button class="classic-button puzzle-equip" data-value="" style="width:140px; text-align:left; font-size:11px;" onclick="SpecialCombatSim.openEquipSelector('${rowId}', 1)">-- 装備なし --</button>
+                    <button class="classic-button puzzle-equip" data-value="" style="width:140px; text-align:left; font-size:11px;" onclick="SpecialCombatSim.openEquipSelector('${rowId}', 2)">-- 装備なし --</button>
+                    <button class="classic-button puzzle-equip" data-value="" style="width:140px; text-align:left; font-size:11px;" onclick="SpecialCombatSim.openEquipSelector('${rowId}', 3)">-- 装備なし --</button>
+                    <button class="classic-button puzzle-equip" data-value="" style="width:140px; text-align:left; font-size:11px;" onclick="SpecialCombatSim.openEquipSelector('${rowId}', 4)">-- 装備なし --</button>
                 </div>
                 <div id="${rowId}-result" style="background:#f0f0f0; padding:5px; font-size:12px;">艦娘を選択してください。</div>
             </div>
@@ -583,17 +590,8 @@ class SpecialCombatSim {
         // データロード完了後、または同期完了後に呼ばれるので、保有状況を再生成する
         this.initPuzzleData();
 
-        // 既にレンダリング済みのパズルドロップダウンがあれば更新する
-        document.querySelectorAll('.puzzle-ship').forEach(sel => {
-            const val = sel.value;
-            sel.innerHTML = this.shipOptionsHTML;
-            sel.value = val;
-        });
-        document.querySelectorAll('.puzzle-equip').forEach(sel => {
-            const val = sel.value;
-            sel.innerHTML = this.itemOptionsHTML;
-            sel.value = val;
-        });
+        // ボタンUIになったため、再描画処理は不要
+        // (選択状態の維持は dataset.value と textContent で行われているため)
 
         // 航空と索敵の更新
         this.updateAirAndLos();
