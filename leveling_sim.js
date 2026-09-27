@@ -80,10 +80,9 @@ class LevelingSim {
             const mst = MasterData.Ships[ship.api_ship_id];
             if (!mst) continue;
             
-            const name = mst.api_name;
+            const name = mst.name;
             const lv = ship.api_lv;
-            const stype = MasterData.Stypes[mst.api_stype];
-            const typeName = stype ? stype.api_name : '';
+            const typeName = mst.type_name;
             const opt = `<option value="${ship.api_id}">Lv.${lv} ${name} (${typeName})</option>`;
             html += opt;
             escortHtml += opt;
@@ -134,9 +133,9 @@ class LevelingSim {
         const addCost = (ship) => {
             const mst = MasterData.Ships[ship.api_ship_id];
             if (mst) {
-                fuelCost += Math.floor(mst.api_fuel_max * 0.20);
-                ammoCost += Math.floor(mst.api_bull_max * 0.20);
-                if (mst.api_stype === 7 || mst.api_stype === 11) { // CV, CVL
+                fuelCost += Math.floor((mst.fuel || 0) * 0.20);
+                ammoCost += Math.floor((mst.ammo || 0) * 0.20);
+                if (mst.stype === 7 || mst.stype === 11) { // CV, CVL
                     bauxCost += 10; // rough guess for 1 battle
                 }
             }
