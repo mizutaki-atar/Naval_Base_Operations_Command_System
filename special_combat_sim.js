@@ -9,84 +9,328 @@ class SpecialCombatSim {
         
         tab.innerHTML = `
             <div class="classic-window" style="margin-bottom:8px;">
-                <div class="classic-titlebar">13. 航空・索敵・対地戦 シミュレーター</div>
+                <div class="classic-titlebar">13. 航空・索敵・対地戦 シミュレーター (パズルカスタマイズ対応)</div>
                 <div class="classic-content" style="padding:15px; height:calc(100vh - 100px); overflow-y:auto;">
-                    <p style="margin-bottom:10px;">
-                        第1艦隊（タブ1で編成した艦隊）の「制空値」「索敵値」、および各艦の「対地特効（陸上型への攻撃力）」を計算します。
-                    </p>
                     
-                    <button class="classic-button" style="width:100%; font-weight:bold; padding:8px; margin-bottom:15px;" onclick="SpecialCombatSim.update()">🔄 現在の第1艦隊で計算・更新する</button>
+                    <button class="classic-button" style="width:100%; font-weight:bold; padding:8px; margin-bottom:15px;" onclick="SpecialCombatSim.importFleet1()">🔄 現在の第1艦隊をインポート</button>
 
                     <!-- 航空戦 -->
                     <div style="background-color:#e8f4f8; padding:10px; border:1px solid #b6d4e1; margin-bottom:15px;">
                         <h3 style="margin-top:0; border-bottom:1px solid #000; color:#000080;">✈️ 航空戦・制空値</h3>
-                        <div style="font-size:12px; margin-bottom:10px; color:#333;">
-                            <strong>【装備の利点】</strong><br>
-                            ・<strong>艦上戦闘機</strong>: 制空値を稼ぐ主力。敵の航空攻撃を弱め、弾着観測射撃を可能にする必須装備です。<br>
-                            ・<strong>艦上爆撃機</strong>: 開幕攻撃＋砲撃戦での火力要員ですが、一部の強力な敵（陸上型）には攻撃できなくなる特性があります。<br>
-                            ・<strong>艦上攻撃機</strong>: 開幕の雷撃ダメージが非常に高く、雑魚散らしに最適です。<br>
-                            ・<strong>水上戦闘機</strong>: 空母を編成できない海域でも、巡洋艦などに積んで制空権を争うことができる重要な装備です。
-                        </div>
-                        <div id="sc-air-result" style="font-size:16px; font-weight:bold; color:#b22222; padding:5px; background:#fff; border:1px inset #ccc;">計算結果がここに表示されます</div>
+                        <div id="sc-air-result" style="font-size:16px; font-weight:bold; color:#b22222; padding:5px; background:#fff; border:1px inset #ccc;">第1艦隊をインポートしてください。</div>
                     </div>
 
                     <!-- 索敵値 -->
                     <div style="background-color:#e8f8e8; padding:10px; border:1px solid #b6e1b6; margin-bottom:15px;">
                         <h3 style="margin-top:0; border-bottom:1px solid #000; color:#006400;">📡 索敵値 (33式)</h3>
-                        <div style="font-size:12px; margin-bottom:10px; color:#333;">
-                            <strong>【装備の利点】</strong><br>
-                            ・<strong>水上偵察機</strong>: 索敵値を大きく稼ぐだけでなく、昼戦の「弾着観測射撃」を発動させるためのキー装備です。<br>
-                            ・<strong>電探（レーダー）</strong>: 索敵値を底上げしつつ、艦隊全体の命中率を向上させます。うずしおの被害も軽減できます。<br>
-                            ・<strong>彩雲（艦上偵察機）</strong>: 空母に積むことで索敵を大きく稼ぎ、「丁字不利」を回避する強力な効果があります。
-                        </div>
-                        <div id="sc-los-result" style="font-size:14px; font-weight:bold; padding:5px; background:#fff; border:1px inset #ccc;">計算結果がここに表示されます</div>
+                        <div id="sc-los-result" style="font-size:14px; font-weight:bold; padding:5px; background:#fff; border:1px inset #ccc;">第1艦隊をインポートしてください。</div>
                     </div>
 
-                    <!-- 陸上戦 -->
+                    <!-- 陸上戦パズルUI -->
                     <div style="background-color:#f8e8e8; padding:10px; border:1px solid #e1b6b6; margin-bottom:15px;">
-                        <h3 style="margin-top:0; border-bottom:1px solid #000; color:#8b0000;">🏝️ 対地戦 (陸上型深海棲艦) 特効</h3>
+                        <h3 style="margin-top:0; border-bottom:1px solid #000; color:#8b0000;">🏝️ 対地戦 (陸上型深海棲艦) 特効パズル</h3>
                         <div style="font-size:12px; margin-bottom:10px; color:#333;">
-                            <strong>【装備の利点】</strong><br>
-                            ・<strong>三式弾</strong>: 重巡や戦艦に積める対地装備。「ソフトスキン型（飛行場姫など）」に対して絶大な倍率（約2.5倍）を誇ります。<br>
-                            ・<strong>WG42 (ロケットランチャー)</strong>: 駆逐や軽巡に積める対地装備。複数積むことで効果が倍増します。<br>
-                            ・<strong>大発動艇 (八九式中戦車など)</strong>: 「砲台小鬼」や「離島棲姫」など、装甲が硬い相手（ハードスキン）に対して必須級のダメージ源です。<br>
-                            ・<strong>特二式内火艇</strong>: 戦車と組み合わせることでシナジー（相乗効果）が発生し、ダメージが爆発的に伸びます。<br>
-                            ※陸上型には「雷装値（魚雷の強さ）」が全く効かないため、艦上爆撃機や雷巡などは相性が非常に悪いです。
+                            <strong>【パズルカスタマイズ】</strong><br>
+                            保有している艦娘・装備は「[保有]」マークが付き上部に表示されます。未保有のものも検証のために選択可能です。<br>
+                            ※集積地棲姫へのダメージは「ソフトスキン倍率 × 集積地固有倍率」で爆発的に跳ね上がります。
                         </div>
-                        <div id="sc-land-result" style="font-size:13px; padding:5px; background:#fff; border:1px inset #ccc;">計算結果がここに表示されます</div>
+                        
+                        <div id="land-puzzle-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+                        
+                        <button class="classic-button" style="margin-top:10px; padding:5px 10px;" onclick="SpecialCombatSim.addPuzzleRow()">➕ 艦娘スロットを追加</button>
                     </div>
                 </div>
             </div>
         `;
+
+        // パズル用データの初期化
+        this.initPuzzleData();
+        // 初期状態として1行追加
+        this.addPuzzleRow();
     }
     
-    static update() {
+    static initPuzzleData() {
+        if (!AppState.userData) return;
+        
+        // 保有IDセット
+        const ownedShipMstIds = new Set(AppState.userData.ships.map(s => s.api_ship_id));
+        const ownedItemMstIds = new Set(AppState.userData.items.map(i => i.api_slotitem_id));
+
+        // 艦娘リスト作成
+        let allShips = Object.values(MasterData.Ships);
+        allShips.sort((a,b) => {
+            let aOwned = ownedShipMstIds.has(a.id);
+            let bOwned = ownedShipMstIds.has(b.id);
+            if (aOwned && !bOwned) return -1;
+            if (!aOwned && bOwned) return 1;
+            return a.id - b.id;
+        });
+        
+        this.shipOptionsHTML = '<option value="">-- 艦娘を選択 --</option>';
+        allShips.forEach(s => {
+            const mark = ownedShipMstIds.has(s.id) ? '[保有]' : '[未]';
+            this.shipOptionsHTML += `<option value="${s.id}">${mark} ${s.name} (${s.type_name})</option>`;
+        });
+
+        // 装備リスト作成
+        let allItems = Object.values(MasterData.Items);
+        allItems.sort((a,b) => {
+            let aOwned = ownedItemMstIds.has(a.id);
+            let bOwned = ownedItemMstIds.has(b.id);
+            if (aOwned && !bOwned) return -1;
+            if (!aOwned && bOwned) return 1;
+            return a.id - b.id;
+        });
+        
+        this.itemOptionsHTML = '<option value="">-- 装備なし --</option>';
+        allItems.forEach(i => {
+            const mark = ownedItemMstIds.has(i.id) ? '[保有]' : '[未]';
+            this.itemOptionsHTML += `<option value="${i.id}">${mark} ${i.name}</option>`;
+        });
+    }
+
+    static addPuzzleRow() {
+        const container = document.getElementById('land-puzzle-container');
+        if (!container) return;
+        
+        const rowId = 'puzzle-row-' + Date.now() + '-' + Math.floor(Math.random()*1000);
+        const html = `
+            <div id="${rowId}" style="background:#fff; border:1px solid #ccc; padding:8px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <select class="classic-select puzzle-ship" style="width:250px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.shipOptionsHTML}</select>
+                    <button class="classic-button" style="color:red; padding:0 8px;" onclick="document.getElementById('${rowId}').remove()">X</button>
+                </div>
+                <div style="display:flex; gap:5px; margin-bottom:5px;">
+                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
+                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
+                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
+                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
+                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
+                </div>
+                <div id="${rowId}-result" style="background:#f0f0f0; padding:5px; font-size:12px;">艦娘を選択してください。</div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+    }
+
+    static calcPuzzleRow(rowId) {
+        const row = document.getElementById(rowId);
+        const resDiv = document.getElementById(rowId + '-result');
+        if (!row || !resDiv) return;
+
+        const shipId = row.querySelector('.puzzle-ship').value;
+        if (!shipId) {
+            resDiv.innerHTML = '艦娘を選択してください。';
+            return;
+        }
+
+        let wgCount = 0;
+        let sanshikiCount = 0;
+        let apShellCount = 0;
+        let tankCount = 0; 
+        let kamiCount = 0; 
+        let daihatsuCount = 0; 
+        let seaplaneBomberCount = 0;
+
+        const equips = row.querySelectorAll('.puzzle-equip');
+        equips.forEach(eq => {
+            const eid = eq.value;
+            if (!eid) return;
+            const mstItem = MasterData.Items[eid];
+            if (!mstItem) return;
+
+            const n = mstItem.name;
+            if (n.includes('WG42') || n.includes('ロケットランチャー') || n.includes('迫撃砲')) wgCount++;
+            if (n.includes('三式弾')) sanshikiCount++;
+            if (n.includes('徹甲弾')) apShellCount++;
+            if (n.includes('特二式内火艇')) kamiCount++;
+            if (n.includes('戦車') || n.includes('陸戦隊')) tankCount++;
+            else if (n.includes('大発動艇') || n.includes('武装大発')) daihatsuCount++;
+            
+            if (mstItem.type && (mstItem.type[2] === 11)) seaplaneBomberCount++; // 水上爆撃機
+        });
+
+        // 簡易倍率計算エンジン (Wiki準拠の概算)
+        let softSkin = 1.0; let softAdd = 0;
+        let pillbox = 1.0; let pillAdd = 0;
+        let island = 1.0; let islAdd = 0;
+        let depot = 1.0; let depAdd = 0;
+
+        // 三式弾
+        if (sanshikiCount > 0) {
+            softSkin *= 2.5;
+            island *= 1.75;
+            // Depot uses softSkin base
+        }
+        
+        // 徹甲弾
+        if (apShellCount > 0) {
+            pillbox *= 1.85;
+            island *= 1.85;
+        }
+
+        // 水上爆撃機
+        if (seaplaneBomberCount > 0) {
+            softSkin *= 1.2;
+            pillbox *= 1.5;
+            island *= 1.5;
+            depot *= 1.2; 
+        }
+
+        // WG42系
+        if (wgCount == 1) {
+            softAdd += 75; pillAdd += 75; islAdd += 75; depAdd += 75;
+            pillbox *= 1.25; island *= 1.3; depot *= 1.25;
+        } else if (wgCount >= 2) {
+            softAdd += 110; pillAdd += 110; islAdd += 110; depAdd += 110;
+            pillbox *= 1.625; island *= 1.82; depot *= 1.625;
+        }
+
+        // 大発系
+        if (daihatsuCount > 0) {
+            pillbox *= 1.5;
+            island *= 1.5;
+            depot *= 1.7;
+        }
+
+        // 戦車系
+        if (tankCount > 0) {
+            softSkin *= 1.2; // roughly
+            pillbox *= 1.8;
+            island *= 1.8;
+            depot *= 1.3; // Stacks with Daihatsu? Actually Tank overrides Daihatsu usually, but we simplify.
+        }
+
+        // 内火艇
+        if (kamiCount > 0) {
+            pillbox *= 2.4;
+            island *= 2.4;
+            depot *= 1.7;
+        }
+
+        // シナジー
+        if (tankCount > 0 && kamiCount > 0) {
+            pillbox *= 1.5;
+            island *= 1.5;
+            // Depot has massive synergy (approx 1.2 extra?)
+            depot *= 1.25; 
+        }
+
+        // 集積地は「ソフトスキン倍率 × 集積地固有倍率」
+        let finalDepot = softSkin * depot;
+        // 火力加算値はそのまま加算
+
+        const formatResult = (multi, add) => {
+            if (multi === 1.0 && add === 0) return '-';
+            let txt = '';
+            if (multi !== 1.0) txt += `<span style="color:red; font-weight:bold;">x${multi.toFixed(2)}</span>`;
+            if (add > 0) txt += ` <span style="color:blue;">(+${add})</span>`;
+            return txt;
+        };
+
+        resDiv.innerHTML = `
+            <table style="width:100%; border-collapse:collapse; margin-top:5px; text-align:center;">
+                <tr>
+                    <th style="border-bottom:1px solid #ccc; width:25%;">ソフトスキン<br>(飛行場姫)</th>
+                    <th style="border-bottom:1px solid #ccc; width:25%;">砲台小鬼</th>
+                    <th style="border-bottom:1px solid #ccc; width:25%;">離島棲姫</th>
+                    <th style="border-bottom:1px solid #ccc; width:25%;">集積地棲姫<br>(乗算)</th>
+                </tr>
+                <tr>
+                    <td>${formatResult(softSkin, softAdd)}</td>
+                    <td>${formatResult(pillbox, pillAdd)}</td>
+                    <td>${formatResult(island, islAdd)}</td>
+                    <td>${formatResult(finalDepot, softAdd+depAdd)}</td>
+                </tr>
+            </table>
+        `;
+    }
+
+    static importFleet1() {
         if (!AppState.simulationFleet || AppState.simulationFleet.length === 0) {
-            const res = document.getElementById('sc-air-result');
-            if (res) res.innerText = '第1艦隊がセットされていません。';
+            alert('第1艦隊に艦娘がセットされていません。');
+            return;
+        }
+
+        const container = document.getElementById('land-puzzle-container');
+        if (container) container.innerHTML = ''; // クリア
+
+        this.updateAirAndLos(); // 航空と索敵の更新
+
+        // 第1艦隊の各艦をパズル行として追加
+        AppState.simulationFleet.forEach(fShip => {
+            if (!fShip) return;
+            const shipData = AppState.userData.ships.find(s => s.api_id === fShip.shipUid);
+            if (!shipData) return;
+            
+            const rowId = 'puzzle-row-' + Date.now() + '-' + Math.floor(Math.random()*1000);
+            this.addPuzzleRowWithId(rowId);
+            
+            // 値のセット
+            setTimeout(() => {
+                const row = document.getElementById(rowId);
+                if (!row) return;
+                const sSelect = row.querySelector('.puzzle-ship');
+                if (sSelect) sSelect.value = shipData.api_ship_id;
+
+                const eSelects = row.querySelectorAll('.puzzle-equip');
+                fShip.equips.forEach((itemId, idx) => {
+                    if (idx >= eSelects.length) return;
+                    if (itemId === -1 || itemId === 0) return;
+                    const itemData = AppState.userData.items[itemId] || AppState.userData.items.find(i => i.api_id === itemId);
+                    if (itemData) {
+                        eSelects[idx].value = itemData.api_slotitem_id;
+                    }
+                });
+                
+                this.calcPuzzleRow(rowId);
+            }, 10);
+        });
+    }
+
+    static addPuzzleRowWithId(rowId) {
+        const container = document.getElementById('land-puzzle-container');
+        if (!container) return;
+        const html = `
+            <div id="${rowId}" style="background:#fff; border:1px solid #ccc; padding:8px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <select class="classic-select puzzle-ship" style="width:250px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.shipOptionsHTML}</select>
+                    <button class="classic-button" style="color:red; padding:0 8px;" onclick="document.getElementById('${rowId}').remove()">X</button>
+                </div>
+                <div style="display:flex; gap:5px; margin-bottom:5px;">
+                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
+                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
+                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
+                    <select class="classic-select puzzle-equip" style="width:140px;" onchange="SpecialCombatSim.calcPuzzleRow('${rowId}')">${this.itemOptionsHTML}</select>
+                </div>
+                <div id="${rowId}-result" style="background:#f0f0f0; padding:5px; font-size:12px;">艦娘を選択してください。</div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+    }
+
+    static update() {
+        // これは app.js から自動同期時に呼ばれるが、パズルUIなので自動更新は航空と索敵だけに留める
+        this.updateAirAndLos();
+    }
+
+    static updateAirAndLos() {
+        if (!AppState.simulationFleet || AppState.simulationFleet.length === 0) {
+            document.getElementById('sc-air-result').innerText = '第1艦隊がセットされていません。';
             return;
         }
 
         let totalAir = 0;
         let losTotalBase = 0;
         let losEquipScore = 0;
-        let landResultsHTML = '<table style="width:100%; border-collapse:collapse;"><tr><th style="border-bottom:1px solid #000; text-align:left;">艦娘</th><th style="border-bottom:1px solid #000;">ソフトスキン(飛行場など)</th><th style="border-bottom:1px solid #000;">砲台小鬼</th><th style="border-bottom:1px solid #000;">離島棲姫</th></tr>';
 
         AppState.simulationFleet.forEach(fShip => {
             if (!fShip) return;
             const shipData = AppState.userData.ships.find(s => s.api_id === fShip.shipUid);
             if (!shipData) return;
-            const mstShip = MasterData.Ships[shipData.api_ship_id];
-            if (!mstShip) return;
-
+            
             let shipLosBase = shipData.api_sakuteki ? shipData.api_sakuteki[0] : 0;
             let shipEquipLos = 0;
-
-            let wgCount = 0;
-            let sanshikiCount = 0;
-            let tankCount = 0; 
-            let kamiCount = 0; 
-            let daihatsuCount = 0; 
 
             fShip.equips.forEach((itemId, idx) => {
                 if (itemId === -1 || itemId === 0) return;
@@ -95,7 +339,6 @@ class SpecialCombatSim {
                 const mstItem = MasterData.Items[itemData.api_slotitem_id];
                 if (!mstItem) return;
 
-                // 索敵
                 if (mstItem.saku) {
                     shipLosBase -= mstItem.saku;
                     let coef = 0.6;
@@ -109,70 +352,17 @@ class SpecialCombatSim {
                     shipEquipLos += mstItem.saku * coef;
                 }
 
-                // 制空 (ざっくり)
                 if (mstItem.tyku && mstItem.tyku > 0 && shipData.api_onslot && shipData.api_onslot[idx] > 0) {
                     if (mstItem.type && [6,7,8,11,45].includes(mstItem.type[2])) {
                         totalAir += Math.floor(mstItem.tyku * Math.sqrt(shipData.api_onslot[idx]));
                     }
                 }
-
-                // 対地
-                if (mstItem.name.includes('WG42') || mstItem.name.includes('ロケットランチャー')) wgCount++;
-                if (mstItem.name.includes('三式弾')) sanshikiCount++;
-                if (mstItem.name.includes('特二式内火艇')) kamiCount++;
-                if (mstItem.name.includes('戦車') || mstItem.name.includes('陸戦隊')) tankCount++;
-                else if (mstItem.name.includes('大発動艇')) daihatsuCount++;
             });
 
             if (shipLosBase < 0) shipLosBase = 0;
             losTotalBase += Math.sqrt(shipLosBase);
             losEquipScore += shipEquipLos;
-
-            // 対地シナジー
-            let softSkin = 1.0;
-            let pillbox = 1.0;
-            let island = 1.0;
-
-            if (sanshikiCount > 0) {
-                softSkin *= 2.5;
-                island *= 1.75;
-            }
-            if (wgCount > 0) {
-                softSkin *= (1.0 + (wgCount * 0.3)); 
-                pillbox *= (1.0 + (wgCount * 0.4));
-                island *= (1.0 + (wgCount * 0.4));
-            }
-            if (daihatsuCount > 0) {
-                softSkin *= 1.0;
-                pillbox *= 1.5;
-                island *= 1.5;
-            }
-            if (tankCount > 0) {
-                softSkin *= 1.0;
-                pillbox *= 1.8;
-                island *= 1.8;
-            }
-            if (kamiCount > 0) {
-                softSkin *= 1.0;
-                pillbox *= 2.4;
-                island *= 2.4;
-            }
-            if (tankCount > 0 && kamiCount > 0) {
-                pillbox *= 1.5;
-                island *= 1.5;
-            }
-
-            const formatMulti = (val) => val === 1.0 ? '-' : `<span style="color:red; font-weight:bold;">x${val.toFixed(2)}</span>`;
-
-            landResultsHTML += `<tr>
-                <td style="border-bottom:1px dotted #ccc; padding:4px;">Lv.${shipData.api_lv} ${mstShip.name}</td>
-                <td style="border-bottom:1px dotted #ccc; text-align:center;">${formatMulti(softSkin)}</td>
-                <td style="border-bottom:1px dotted #ccc; text-align:center;">${formatMulti(pillbox)}</td>
-                <td style="border-bottom:1px dotted #ccc; text-align:center;">${formatMulti(island)}</td>
-            </tr>`;
         });
-
-        landResultsHTML += '</table>';
 
         const hqLv = (AppState.userData && AppState.userData.basic) ? AppState.userData.basic.api_level : 120;
         const hqPenalty = Math.ceil(0.4 * hqLv);
@@ -183,9 +373,11 @@ class SpecialCombatSim {
             return (losEquipScore * coef) + losTotalBase - hqPenalty + emptyBonus;
         };
 
-        document.getElementById('sc-air-result').innerHTML = `第1艦隊合計 <strong>制空値: 約 ${totalAir}</strong><br><span style="font-size:11px; font-weight:normal; color:#555;">※熟練度ボーナス（+25等）は未計算の基礎値です。</span>`;
+        const airRes = document.getElementById('sc-air-result');
+        if (airRes) airRes.innerHTML = `第1艦隊合計 <strong>制空値: 約 ${totalAir}</strong><br><span style="font-size:11px; font-weight:normal; color:#555;">※熟練度ボーナスは未計算の基礎値です。</span>`;
         
-        document.getElementById('sc-los-result').innerHTML = `
+        const losRes = document.getElementById('sc-los-result');
+        if (losRes) losRes.innerHTML = `
             司令部Lv: ${hqLv} / 艦娘素索敵計: ${losTotalBase.toFixed(1)} / 装備索敵スコア: ${losEquipScore.toFixed(1)}<br>
             <div style="margin-top:5px;">
                 33式 索敵値 (分岐点係数1): <span style="color:#006400; font-weight:bold;">${calc33(1).toFixed(1)}</span><br>
@@ -193,10 +385,6 @@ class SpecialCombatSim {
                 33式 索敵値 (分岐点係数3): <span style="color:#006400; font-weight:bold;">${calc33(3).toFixed(1)}</span><br>
                 33式 索敵値 (分岐点係数4): <span style="color:#006400; font-weight:bold;">${calc33(4).toFixed(1)}</span>
             </div>
-        `;
-
-        document.getElementById('sc-land-result').innerHTML = landResultsHTML + `
-            <div style="font-size:11px; margin-top:5px; color:#666;">※WG42などは実際には固定ダメージ加算の性質を持ちますが、目安としてシナジー倍率に換算して表示しています。改修値は計算に含まれません。</div>
         `;
     }
 }
