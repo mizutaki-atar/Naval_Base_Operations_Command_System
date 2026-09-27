@@ -961,7 +961,7 @@ function updateAdmiralInfo() {
     const el = document.getElementById('admiral-info');
     if (!el) return;
     const basic = AppState.userData.basic;
-    if (basic) {
+    if (basic && basic.api_nickname) {
         let rankStr = '提督';
         const ranks = {1:'元帥', 2:'大将', 3:'中将', 4:'少将', 5:'大佐', 6:'中佐', 7:'新米少佐', 8:'中堅少佐', 9:'中佐', 10:'大佐'};
         if (ranks[basic.api_rank]) rankStr = ranks[basic.api_rank];
