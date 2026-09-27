@@ -581,7 +581,9 @@ class ArsenalAdvisor {
         for (const it of this.items) {
             const master = MasterData.Items[it.id];
             if (master) {
-                if (counts[master.typeName] !== undefined) counts[master.typeName]++;
+                let tName = master.typeName;
+                if (tName === '対艦強化弾') tName = '徹甲弾';
+                if (counts[tName] !== undefined) counts[tName]++;
             }
         }
 
