@@ -133,6 +133,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 Object.assign(AppState.userData.quests, updates.quests);
             }
         }
+        if (updates.basic) {
+            AppState.userData.basic = updates.basic;
+        }
         // deckbuilder等は必要に応じて
         
         await KCSDB.set('userdata', 'latest', AppState.userData);
@@ -954,7 +957,33 @@ ${fleetText}
 
 // --- UI Helpers ---
 
+function updateAdmiralInfo() {
+    const el = document.getElementById('admiral-info');
+    if (!el) return;
+    const basic = AppState.userData.basic;
+    if (basic) {
+        let rankStr = '提督';
+        const ranks = {1:'元帥', 2:'大将', 3:'中将', 4:'少将', 5:'大佐', 6:'中佐', 7:'新米少佐', 8:'中堅少佐', 9:'中佐', 10:'大佐'};
+        if (ranks[basic.api_rank]) rankStr = ranks[basic.api_rank];
+        
+        let startYear = '';
+        if (basic.api_starttime) {
+            const dt = new Date(basic.api_starttime);
+            if (!isNaN(dt.getTime())) {
+                startYear = ' (' + dt.getFullYear() + '年着任)';
+            }
+        }
+        
+        const exp = basic.api_experience || 0;
+        
+        el.textContent = `[${basic.api_nickname} ${rankStr}] Lv.${basic.api_level}${startYear} / 提督経験値: ${exp}`;
+    } else {
+        el.textContent = '';
+    }
+}
+
 function updateAllViews() {
+    updateAdmiralInfo();
     // タブ1の更新（仮想編成エディタの描画）
     const fleetContainer = document.getElementById('fleet1-container');
     if (fleetContainer) {

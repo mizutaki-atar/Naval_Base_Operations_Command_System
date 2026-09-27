@@ -42,6 +42,9 @@ class AutoSyncWatcher {
         else if (d.api_deck) {
             cats.decks = d.api_deck; // デッキだけ単独APIのケース
         }
+        if (d.api_basic) {
+            cats.basic = d.api_basic;
+        }
 
         return Object.keys(cats).length > 0 ? cats : null;
     }
