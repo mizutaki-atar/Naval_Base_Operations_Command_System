@@ -966,19 +966,11 @@ function updateAdmiralInfo() {
         const ranks = {1:'元帥', 2:'大将', 3:'中将', 4:'少将', 5:'大佐', 6:'中佐', 7:'新米少佐', 8:'中堅少佐', 9:'中佐', 10:'大佐'};
         if (ranks[basic.api_rank]) rankStr = ranks[basic.api_rank];
         
-        let startYear = '';
-        if (basic.api_starttime) {
-            const dt = new Date(basic.api_starttime);
-            if (!isNaN(dt.getTime())) {
-                startYear = ' (' + dt.getFullYear() + '年着任)';
-            }
-        }
-        
         const exp = basic.api_experience || 0;
         const name = basic.api_nickname || '提督名不明';
         const lv = basic.api_level || '?';
         
-        el.textContent = `[${name} ${rankStr}] Lv.${lv}${startYear} / 提督経験値: ${exp}`;
+        el.textContent = `[${name} ${rankStr}] Lv.${lv} / 提督経験値: ${exp}`;
     } else {
         el.textContent = '';
     }
