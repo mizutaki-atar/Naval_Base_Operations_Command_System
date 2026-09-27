@@ -6,7 +6,7 @@ const STAT_KEYS = [
 ];
 
 function calcShipTotalStats(slotData) {
-    let stats = { hp:0, armor:0, evade:0, fire:0, torp:0, aa:0, asw:0, eqAsw:0, los:0, luck:0, speed:0, range:0, bomb:0 };
+    let stats = { hp:0, armor:0, evade:0, fire:0, torp:0, aa:0, asw:0, eqAsw:0, aswGearCount:0, los:0, luck:0, speed:0, range:0, bomb:0 };
     if (!slotData) return stats;
     
     const ship = AppState.userData.ships.find(x => x.uid === slotData.shipUid);
@@ -49,6 +49,12 @@ function calcShipTotalStats(slotData) {
         stats.aa += im.aa || 0;
         stats.asw += im.asw || 0;
         stats.eqAsw += im.asw || 0;
+        
+        let tName = im.typeName || "";
+        if (tName === 'ソナー' || tName === '大型ソナー' || tName === '爆雷') {
+            stats.aswGearCount += 1;
+        }
+
         stats.los += im.los || 0;
         stats.luck += im.luck || 0;
         stats.bomb += im.bomb || im.api_baku || 0;

@@ -190,6 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     aa: st.aa, 
                     asw: st.asw,
                     eqAsw: st.eqAsw,
+                    aswGearCount: st.aswGearCount,
                     armor: st.armor, 
                     evade: st.evade,
                     speed: st.speed,
@@ -409,7 +410,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         let bbWithNoPlane = fleetShips.filter(s => (s.name.includes('戦艦') || [8,9,10].includes(s.stype)) && (s.asw || 0) === 0 && s.name !== '謎の敵' && !s.name.includes('レ級')); 
         // 簡易的に水上機の判定が難しいので保留するか、手動で判定
         
-        let aswShips = fleetShips.filter(s => (s.eqAsw || 0) >= 10); // 装備対潜値の合計が10以上（ソナーや爆雷を積んでいる）
+        let aswShips = fleetShips.filter(s => (s.aswGearCount || 0) > 0); // ソナーや爆雷を積んでいる艦
         
         // ボスに潜水艦がいるかの判定（3段階フォールバック）
         let hasBossSub = false;
