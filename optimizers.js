@@ -334,7 +334,7 @@ class MapStrategyOptimizer {
             const idx = availableShips.findIndex(s => {
                 if (reqStype === 'ANY') return true;
                 const master = MasterData.Ships[s.id];
-                return master && master.type_name.includes(reqStype);
+                return master && MasterData.matchStype(master.type_name, reqStype);
             });
             if (idx !== -1) fleet.push(availableShips.splice(idx, 1)[0]);
             else {

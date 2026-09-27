@@ -4,6 +4,29 @@
  */
 
 const MasterData = {
+    matchStype: function(typeName, reqStype) {
+        if (!typeName) return false;
+        if (reqStype === 'ANY') return true;
+        if (typeName.includes(reqStype)) return true;
+        
+        const aliases = {
+            '雷巡': ['重雷装巡洋艦'],
+            '水母': ['水上機母艦'],
+            '航戦': ['航空戦艦'],
+            '航巡': ['航空巡洋艦'],
+            '軽空母': ['軽空母'],
+            '正規空母': ['正規空母', '装甲空母'],
+            '空母系': ['軽空母', '正規空母', '装甲空母'],
+            '潜水艦': ['潜水艦', '潜水空母'],
+            '潜水': ['潜水艦', '潜水空母'],
+            '戦艦': ['戦艦', '航空戦艦', '超弩級戦艦', '巡洋戦艦', '高速戦艦']
+        };
+        
+        if (aliases[reqStype]) {
+            return aliases[reqStype].some(a => typeName.includes(a));
+        }
+        return false;
+    },
     Stype: typeof WikiKnowledgeDB !== 'undefined' ? WikiKnowledgeDB.Stype : {},
     EquipType: {},
     Ships: typeof WikiKnowledgeDB !== 'undefined' ? WikiKnowledgeDB.Ships : {},

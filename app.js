@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             let missing = [];
             let tempCurrent = [...currentStypes];
             for (const req of mapData.stypes || []) {
-                const idx = tempCurrent.findIndex(t => t && t.includes(req));
+                const idx = tempCurrent.findIndex(t => MasterData.matchStype(t, req));
                 if (idx !== -1) tempCurrent.splice(idx, 1);
                 else missing.push(req);
             }
