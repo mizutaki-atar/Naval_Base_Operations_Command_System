@@ -77,12 +77,12 @@ class LevelingSim {
         const sorted = [...AppState.userData.ships].sort((a,b) => b.api_lv - a.api_lv);
         
         for (const ship of sorted) {
-            const mst = MasterData.ships[ship.api_ship_id];
+            const mst = MasterData.Ships[ship.api_ship_id];
             if (!mst) continue;
             
             const name = mst.api_name;
             const lv = ship.api_lv;
-            const stype = MasterData.stypes[mst.api_stype];
+            const stype = MasterData.Stypes[mst.api_stype];
             const typeName = stype ? stype.api_name : '';
             const opt = `<option value="${ship.api_id}">Lv.${lv} ${name} (${typeName})</option>`;
             html += opt;
@@ -132,7 +132,7 @@ class LevelingSim {
         let bauxCost = 0; // rough estimation
         
         const addCost = (ship) => {
-            const mst = MasterData.ships[ship.api_ship_id];
+            const mst = MasterData.Ships[ship.api_ship_id];
             if (mst) {
                 fuelCost += Math.floor(mst.api_fuel_max * 0.20);
                 ammoCost += Math.floor(mst.api_bull_max * 0.20);
