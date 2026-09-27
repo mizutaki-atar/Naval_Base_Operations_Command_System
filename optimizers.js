@@ -429,7 +429,7 @@ class MapStrategyOptimizer {
             // 艦種とマップに応じたテンプレート
             const isAntiInst = mapDesc.includes("陸上") || mapDesc.includes("対地");
 
-            if (stype.includes("駆逐") || stype.includes("海防艦")) {
+            if (MasterData.matchStype(stype, "駆逐") || MasterData.matchStype(stype, "海防艦")) {
                 if (isASWMap) {
                     assignedEquips = [popBestItem(['ソナー']), popBestItem(['爆雷投射機']), popBestItem(['爆雷', 'ソナー'])];
                 } else if (isAntiInst) {
@@ -442,7 +442,7 @@ class MapStrategyOptimizer {
                 } else {
                     assignedEquips = [popBestItem(['小口径主砲', '12.7cm連装砲D型']), popBestItem(['小口径主砲', '12.7cm連装砲D型']), popBestItem(['電探', '魚雷'])];
                 }
-            } else if (stype.includes("軽巡") || stype.includes("雷巡")) {
+            } else if (MasterData.matchStype(stype, "軽巡") || MasterData.matchStype(stype, "雷巡")) {
                 if (isASWMap) {
                     assignedEquips = [popBestItem(['ソナー']), popBestItem(['爆雷投射機']), popBestItem(['爆雷', 'ソナー', '水上偵察機'])];
                 } else if (isAntiInst) {
@@ -454,7 +454,7 @@ class MapStrategyOptimizer {
                 } else {
                     assignedEquips = [popBestItem(['中口径主砲', '小口径主砲']), popBestItem(['中口径主砲', '小口径主砲']), popBestItem(['水上偵察機', '甲標的', '電探'])];
                 }
-            } else if (stype.includes("戦艦")) {
+            } else if (MasterData.matchStype(stype, "戦艦")) {
                 // 特殊砲撃(タッチ)対応艦なら徹甲弾+電探を最優先
                 if (s.name.match(/大和|長門|陸奥|Nelson|Colorado/)) {
                     assignedEquips = [popBestItem(['大口径主砲']), popBestItem(['大口径主砲']), popBestItem(['徹甲弾']), popBestItem(['大型電探', '水上電探'])];
@@ -465,7 +465,7 @@ class MapStrategyOptimizer {
                 } else {
                     assignedEquips = [popBestItem(['大口径主砲']), popBestItem(['大口径主砲']), popBestItem(['水上偵察機', '水上観測機']), popBestItem(['徹甲弾', '電探'])];
                 }
-            } else if (stype.includes("空母")) {
+            } else if (MasterData.matchStype(stype, "空母")) {
                 if (isNightMap) {
                     // 夜襲CI: 夜戦 + 夜攻 + FBA
                     assignedEquips = [popBestItem(['夜間戦闘機', '艦上戦闘機']), popBestItem(['夜間攻撃機', '艦上攻撃機']), popBestItem(['艦上爆撃機']), popBestItem(['夜間作戦航空要員', '艦上戦闘機'])];
@@ -475,7 +475,7 @@ class MapStrategyOptimizer {
                     // FBA (戦爆連合)
                     assignedEquips = [popBestItem(['艦上攻撃機']), popBestItem(['艦上爆撃機']), popBestItem(['艦上戦闘機']), popBestItem(['艦上戦闘機', '彩雲'])];
                 }
-            } else if (stype.includes("重巡") || stype.includes("航巡")) {
+            } else if (MasterData.matchStype(stype, "重巡") || MasterData.matchStype(stype, "航巡")) {
                 if (isAntiInst) {
                     assignedEquips = [popBestItem(['中口径主砲']), popBestItem(['中口径主砲']), popBestItem(['三式弾']), popBestItem(['WG42', '水上爆撃機'])];
                 } else {
