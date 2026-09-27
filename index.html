@@ -167,6 +167,7 @@
                     <button class="classic-button tab-btn" style="width:100%; text-align:left; margin-bottom:2px;" data-target="tab8">8. 追加報告更新</button>
                     <button class="classic-button tab-btn" style="width:100%; text-align:left; margin-bottom:2px;" data-target="tab9">9. 特別海域関連札付艦確認</button>
                     <button class="classic-button tab-btn" style="width:100%; text-align:left; margin-bottom:2px;" data-target="tab10">10. 発動条件＆特殊攻撃シミュ</button>
+                    <button class="classic-button tab-btn" style="width:100%; text-align:left; margin-bottom:2px;" data-target="tab11">11. シミュレーター計算根拠</button>
                 </div>
             </div>
         </div>
@@ -585,6 +586,50 @@
                 <div class="classic-inset" style="margin-top:8px;">
                     <div>[運用助言] <a id="id-wiki-link" href="#" target="_blank">Wiki</a></div>
                     <ul id="id-advice-list" style="margin:0; padding-left:16px;"></ul>
+                </div>
+            </div>
+
+            <!-- タブ11: シミュレーター計算根拠 -->
+            <div id="tab11" class="tab-content">
+                <div class="classic-window" style="margin-bottom:8px; height:calc(100vh - 40px); overflow-y:auto;">
+                    <div class="classic-titlebar">シミュレーター計算式と根拠（Wiki検証準拠）</div>
+                    <div class="classic-content" style="padding:16px; font-size:13px; line-height:1.6;">
+                        <h3 style="border-bottom:1px solid gray; margin-bottom:8px;">当シミュレーターの計算根拠について</h3>
+                        <p style="margin-bottom:16px;">
+                            当システムの「海域作戦立案システム」に搭載されている戦闘シミュレーター（<code>simulator.js</code>）は、
+                            過去10年以上にわたり艦これ検証勢（プレイヤーコミュニティ）によって検証・解明されてきた計算式をベースに構築されています。<br>
+                            主に「艦隊これくしょん -艦これ- 攻略 Wiki*」等で結論付けられている検証済みデータに基づいています。
+                        </p>
+
+                        <h4 style="color:blue;">1. 命中率と回避率の計算</h4>
+                        <ul style="margin-top:0; margin-bottom:16px;">
+                            <li><strong>基礎命中率:</strong> プレイヤー側 95%、深海棲艦側 75% を基準とします。</li>
+                            <li><strong>疲労・キラキラ補正:</strong> コンディション値50以上（キラキラ状態）の場合、命中率に 1.2倍、回避率に 1.5倍 の補正を掛けます。オレンジ疲労（20〜29）で0.8倍、赤疲労（19以下）で0.5倍となります。</li>
+                            <li><strong>レベル回避補正:</strong> 艦娘の回避ステータスに対し、レベルに応じた回避ボーナス（<code>√(Lv) × 2</code>）を加算しています。</li>
+                            <li><strong>命中キャップ:</strong> どんなにステータスが高くとも（あるいは低くとも）、最低命中率は 10%、最高命中率は 97% に設定し、絶対回避や絶対命中を防ぐ艦これの仕様を再現しています。</li>
+                        </ul>
+
+                        <h4 style="color:blue;">2. ダメージ計算と装甲乱数</h4>
+                        <ul style="margin-top:0; margin-bottom:16px;">
+                            <li><strong>攻撃力（キャップ前）:</strong> フェーズに応じた基本攻撃力（火力/雷装）に、陣形補正（単縦陣 1.0、複縦陣 0.8など）および、交戦形態補正（T字有利 1.2、反航戦 0.8など）を乗算します。</li>
+                            <li><strong>クリティカル補正:</strong> クリティカルヒット時は、キャップ後の攻撃力を 1.5倍 にします。</li>
+                            <li><strong>装甲乱数（ダメージのブレ）:</strong> 敵の装甲値に対し、固定値ではなく <code>0.7〜1.3</code> 倍（システム上は <code>装甲 × (0.7 + 0～0.6の乱数)</code>）を掛けた値を「防御力」として攻撃力から引きます。これがWiki等で検証されている「装甲乱数」の再現です。</li>
+                        </ul>
+
+                        <h4 style="color:blue;">3. 大破ストッパー（割合ダメージ変換）</h4>
+                        <ul style="margin-top:0; margin-bottom:16px;">
+                            <li><strong>発動条件:</strong> プレイヤー側の艦娘が「被弾前のHPが最大HPの25%を超えている（中破以上でない）」かつ「現在HP以上のダメージを受けた（本来なら一撃で沈むダメージ）」場合。</li>
+                            <li><strong>変換計算式:</strong> 本来の即死ダメージを無効化し、代わりに <code>現在HPの 50% 〜 79%</code> の割合ダメージに変換します。<br>これにより「中破ストッパー」「大破ストッパー」が機能し、一発大破を免れる艦これ特有のダメージコントロール仕様を完全に再現しています。</li>
+                        </ul>
+
+                        <h4 style="color:blue;">4. 総合期待値（モンテカルロ法）の計算根拠</h4>
+                        <p style="margin-top:0;">
+                            各マスのS勝利率を単純に掛け算するのではなく、<strong>実際に「各マスの戦闘を順番にこなし、HPダメージや大破状態を引き継ぎながら進軍する」というシミュレーションを裏で 10,000回（10,000周） 実行</strong>しています。<br>
+                            ・大破ストッパーを抜けて「現在HPが最大HPの25%以下」になった艦娘が出た時点で「道中大破撤退」としてその周回を打ち切ります。<br>
+                            ・最終的に「大破撤退せずに無事にボスマスに到達し、かつ敵を全滅させた回数」を10,000で割ったものが「ボスマスS勝利総合期待値」として表示されます。<br>
+                            このため、「Aマスで被弾したせいでBマスで大破しやすくなる」といったダメージ持ち越しのリスク（条件付き確率）も正確に反映された現実的な期待値となっています。
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
