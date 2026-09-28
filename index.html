@@ -200,14 +200,27 @@
                                     まずは専用の拡張機能（ZIPファイル）をお手元のPCにダウンロード・保存し、解凍（展開）してください。<br>
                                     <a href="chrome_ext.zip" download="chrome_ext.zip" style="display:inline-block; margin-top:5px; padding:6px 12px; background-color:#000080; color:#fff; text-decoration:none; border-radius:4px; font-weight:bold;">📥 拡張機能（chrome_ext.zip）をダウンロード</a>
                                 </li>
-                                <li style="margin-bottom: 8px;">Google Chromeを開き、URLバーに <code>chrome://extensions/</code> と入力して拡張機能管理画面を開きます。</li>
-                                <li style="margin-bottom: 8px;">画面右上の<strong>「デベロッパーモード」</strong>というスイッチをオンにします。</li>
-                                <li style="margin-bottom: 8px;">左上に現れる<strong>「パッケージ化されていない拡張機能を読み込む」</strong>ボタンを押し、先ほど解凍した <code>chrome_ext</code> フォルダを選択します。</li>
+                                <li style="margin-bottom: 8px;">お使いのブラウザ（Edge推奨 / Chrome）で拡張機能管理画面を開きます。<br>
+                                    Edgeの場合： <code>edge://extensions/</code><br>
+                                    Chromeの場合： <code>chrome://extensions/</code>
+                                </li>
+                                <li style="margin-bottom: 8px;">画面内にある<strong>「開発者モード（デベロッパーモード）」</strong>というスイッチをオンにします。</li>
+                                <li style="margin-bottom: 8px;"><strong>「パッケージ化されていない拡張機能を読み込む」</strong>ボタンを押し、先ほど解凍した <code>chrome_ext</code> フォルダを選択します。</li>
                                 <li style="margin-bottom: 8px;">拡張機能一覧に「鎮守府作戦司令部 Auto-Sync」が追加されたら導入完了です！</li>
                                 <li style="margin-bottom: 8px;">通常通りDMM等で艦これを開き、ゲームをプレイしてください（「母港」画面を開けばデータが取得されます）。</li>
                                 <li>このシステム（作戦司令部）のページを開くと、右上の状態表示が<strong>「🟢 拡張機能と同期中」</strong>となり、あなたの最新データが自動的に画面に反映されます！</li>
                             </ol>
-                            <p style="margin-top: 10px; font-size: 12px; color: #555;">※他の艦これ専用拡張機能と同時に使用しても問題なく動作します。</p>
+                            
+                            <div style="margin-top: 15px; padding: 10px; background-color: #ffe4e1; border-left: 4px solid #b22222; font-size: 13px;">
+                                <strong style="color: #b22222;">⚠️ 同期されない場合（トラブルシューティング）</strong>
+                                <ul style="list-style-type: disc; padding-left: 20px; margin-top: 5px; margin-bottom: 0;">
+                                    <li style="margin-bottom: 4px;"><strong>Edgeのスリープタブ機能:</strong> 司令部のタブを裏で開いていると、Edgeが勝手にスリープさせてしまい同期が止まるケースが最も多いです。Edgeの設定「システムとパフォーマンス」から「効率モード」をオフにするか、本サイトと艦これのURLを「スリープしないサイト」に設定してください。</li>
+                                    <li style="margin-bottom: 4px;"><strong>ローカルファイルで開いている:</strong> <code>index.html</code> を直接ダブルクリックして <code>file:///...</code> というURLで開いていると同期されません。Web版のURLか <code>起動.bat</code> を使用してください。</li>
+                                    <li style="margin-bottom: 4px;"><strong>トラッキング防止機能:</strong> Edgeのセキュリティ設定（トラッキング防止）が「厳重」になっているとブロックされる場合があります。「基本」に変更してください。</li>
+                                    <li><strong>他の拡張機能との競合:</strong> KC3改など、他の艦これ用拡張機能を同時に有効にしていると通信が取得できない場合があります。</li>
+                                </ul>
+                            </div>
+                            <p style="margin-top: 10px; font-size: 12px; color: #555;">※他の艦これ専用拡張機能と同時に使用しても基本的には問題なく動作します。（競合で取得できない場合を除く）</p>
                         </div>
 
                         <div style="background-color: #f9f9f9; border: 1px solid #808080; padding: 15px;">
@@ -684,6 +697,7 @@
     <script src="./quests.js?v=45"></script>
     <script src="./knowledge_base.js?v=45"></script>
     <script src="./synergy_engine.js?v=45"></script>
+    <script src="./routing_data.js?v=45"></script>
     <script src="./simulator.js?v=45"></script>
     <script src="./optimizers.js?v=45"></script>
     <script src="./knowledge_ingestor.js?v=45"></script>
